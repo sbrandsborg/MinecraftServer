@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="da">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ATM 10 Minecraft Server</title>
+    <title>SBrandsborg Minecraft ATM 10 Server</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -15,22 +15,20 @@
         h1 {
             color: #4CAF50;
         }
-        .server-status {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #333;
-            border-radius: 8px;
-            display: inline-block;
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 600px;
+            margin: 0 auto;
         }
-        .rules, .settings, .whitelist {
+        .section {
             margin-top: 20px;
             padding: 15px;
             background-color: #222;
             border-radius: 8px;
-            display: inline-block;
             text-align: left;
-            width: 80%;
-            max-width: 600px;
+            width: 100%;
         }
         ul {
             list-style: none;
@@ -48,45 +46,49 @@
 </head>
 <body>
 
-    <h1>ATM 10 Minecraft Server</h1>
-    
-    <div class="server-status">
-        <h2>🌐 Server Status</h2>
-        <p id="server-info">Henter serverdata...</p>
-    </div>
+    <h1>SBrandsborg Minecraft ATM 10 Server</h1>
 
-    <div class="rules">
-        <h2>🚨 Regler</h2>
-        <ul>
-            <li>🔹 Ingen griefing eller tyveri</li>
-            <li>🔹 Respektér andre spillere</li>
-            <li>🔹 Brug ikke hacks eller exploits</li>
-            <li>🔹 Ingen unødvendigt lag (store maskiner uden optimering)</li>
-        </ul>
-    </div>
+    <div class="container">
 
-    <div class="settings">
-        <h2>⚙️ Custom Settings</h2>
-        <ul>
-            <li>❌ Keep Inventory: <strong>OFF</strong></li>
-            <li>⚡ AE2 Channels: <strong>Deaktiveret</strong></li>
-            <li>🗺️ Waystones: <strong>Global ændring aktiveret</strong></li>
-        </ul>
-    </div>
+        <div class="section">
+            <h2>🌐 Server Status</h2>
+            <p id="server-info">Fetching server data...</p>
+        </div>
 
-    <div class="whitelist">
-        <h2>🔒 Whitelist</h2>
-        <p>Serveren bruger **whitelist**! Hvis du vil spille, kontakt mig på Discord:</p>
-        <p><strong>DinDiscord#1234</strong></p>
+        <div class="section">
+            <h2>🚨 Rules</h2>
+            <ul>
+                <li>🔹 No griefing or stealing</li>
+                <li>🔹 Respect other players</li>
+                <li>🔹 No hacks or exploits</li>
+                <li>🔹 Avoid unnecessary lag (optimize large machines)</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>⚙️ Custom Settings</h2>
+            <ul>
+                <li>❌ Keep Inventory: <strong>OFF</strong></li>
+                <li>⚡ AE2 Channels: <strong>Disabled</strong></li>
+                <li>🗺️ Waystones: <strong>Global setting changed</strong></li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>🔒 Whitelist</h2>
+            <p>This server is **whitelisted**! If you want to join, contact me on Discord:</p>
+            <p><strong>sbrandsborg</strong></p>
+        </div>
+
     </div>
 
     <div class="footer">
-        <p>ATM 10 Minecraft Server - Kører version <span id="server-version">Henter...</span></p>
+        <p>SBrandsborg Minecraft ATM 10 Server - Running version <span id="server-version">Fetching...</span></p>
     </div>
 
     <script>
         async function fetchServerStatus() {
-            const serverIP = "your.server.ip"; // Erstat med din server-IP
+            const serverIP = "85.191.11.59"; // Your actual server IP
             const apiURL = `https://api.mcsrvstat.us/2/${serverIP}`;
 
             try {
@@ -95,17 +97,17 @@
 
                 if (data.online) {
                     document.getElementById("server-info").innerHTML = 
-                        `✅ Online - ${data.players.online} / ${data.players.max} spillere`;
+                        `✅ Online - ${data.players.online} / ${data.players.max} players`;
 
                     document.getElementById("server-version").innerText = 
-                        data.version ? data.version : "Ukendt version";
+                        data.version ? data.version : "Unknown version";
                 } else {
                     document.getElementById("server-info").innerHTML = "❌ Server offline";
-                    document.getElementById("server-version").innerText = "Ukendt";
+                    document.getElementById("server-version").innerText = "Unknown";
                 }
             } catch (error) {
-                document.getElementById("server-info").innerHTML = "⚠️ Fejl ved hentning af data";
-                document.getElementById("server-version").innerText = "Ukendt";
+                document.getElementById("server-info").innerHTML = "⚠️ Error fetching data";
+                document.getElementById("server-version").innerText = "Unknown";
             }
         }
 
