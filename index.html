@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SBrandsborg Minecraft ATM 10 Server</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -42,6 +43,27 @@
             font-size: 14px;
             color: #ccc;
         }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        @media (max-width: 600px) {
+            body {
+                font-size: 16px;
+            }
+            .container {
+                width: 95%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -53,6 +75,7 @@
         <div class="section">
             <h2>🌐 Server Status</h2>
             <p id="server-info">Fetching server data...</p>
+            <button onclick="copyIP()">Join Server</button>
         </div>
 
         <div class="section">
@@ -68,7 +91,6 @@
         <div class="section">
             <h2>⚙️ Custom Settings</h2>
             <ul>
-                <li>❌ Keep Inventory: <strong>OFF</strong></li>
                 <li>⚡ AE2 Channels: <strong>Disabled</strong></li>
                 <li>🗺️ Waystones: <strong>Global setting changed</strong></li>
             </ul>
@@ -80,6 +102,12 @@
             <p><strong>sbrandsborg</strong></p>
         </div>
 
+        <div class="section">
+            <h2>🔄 Automatic Backups & Restarts</h2>
+            <p>✅ The server is backed up **every hour**.</p>
+            <p>🔄 The server restarts **every night at 04:00** to keep performance optimal.</p>
+        </div>
+
     </div>
 
     <div class="footer">
@@ -88,7 +116,7 @@
 
     <script>
         async function fetchServerStatus() {
-            const serverIP = "85.191.11.59"; // Your actual server IP
+            const serverIP = "minecraft.sbrandsborg.dk"; // Your actual server IP
             const apiURL = `https://api.mcsrvstat.us/2/${serverIP}`;
 
             try {
@@ -111,7 +139,13 @@
             }
         }
 
+        function copyIP() {
+            navigator.clipboard.writeText("minecraft.sbrandsborg.dk");
+            alert("IP copied to clipboard!");
+        }
+
         fetchServerStatus();
+        setInterval(fetchServerStatus, 60000); // Update every minute
     </script>
 
 </body>
