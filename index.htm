@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATM 10 Minecraft Server</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1e1e1e;
+            color: #ffffff;
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #4CAF50;
+        }
+        .server-status {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #333;
+            border-radius: 8px;
+            display: inline-block;
+        }
+        .rules, .settings, .whitelist {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #222;
+            border-radius: 8px;
+            display: inline-block;
+            text-align: left;
+            width: 80%;
+            max-width: 600px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            margin: 5px 0;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 14px;
+            color: #ccc;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>ATM 10 Minecraft Server</h1>
+    
+    <div class="server-status">
+        <h2>🌐 Server Status</h2>
+        <p id="server-info">Henter serverdata...</p>
+    </div>
+
+    <div class="rules">
+        <h2>🚨 Regler</h2>
+        <ul>
+            <li>🔹 Ingen griefing eller tyveri</li>
+            <li>🔹 Respektér andre spillere</li>
+            <li>🔹 Brug ikke hacks eller exploits</li>
+            <li>🔹 Ingen unødvendigt lag (store maskiner uden optimering)</li>
+        </ul>
+    </div>
+
+    <div class="settings">
+        <h2>⚙️ Custom Settings</h2>
+        <ul>
+            <li>❌ Keep Inventory: <strong>OFF</strong></li>
+            <li>⚡ AE2 Channels: <strong>Deaktiveret</strong></li>
+            <li>🗺️ Waystones: <strong>Global ændring aktiveret</strong></li>
+        </ul>
+    </div>
+
+    <div class="whitelist">
+        <h2>🔒 Whitelist</h2>
+        <p>Serveren bruger **whitelist**! Hvis du vil spille, kontakt mig på Discord:</p>
+        <p><strong>DinDiscord#1234</strong></p>
+    </div>
+
+    <div class="footer">
+        <p>ATM 10 Minecraft Server - Kører version <span id="server-version">Henter...</span></p>
+    </div>
+
+    <script>
+        async function fetchServerStatus() {
+            const serverIP = "your.server.ip"; // Erstat med din server-IP
+            const apiURL = `https://api.mcsrvstat.us/2/${serverIP}`;
+
+            try {
+                const response = await fetch(apiURL);
+                const data = await response.json();
+
+                if (data.online) {
+                    document.getElementById("server-info").innerHTML = 
+                        `✅ Online - ${data.players.online} / ${data.players.max} spillere`;
+
+                    document.getElementById("server-version").innerText = 
+                        data.version ? data.version : "Ukendt version";
+                } else {
+                    document.getElementById("server-info").innerHTML = "❌ Server offline";
+                    document.getElementById("server-version").innerText = "Ukendt";
+                }
+            } catch (error) {
+                document.getElementById("server-info").innerHTML = "⚠️ Fejl ved hentning af data";
+                document.getElementById("server-version").innerText = "Ukendt";
+            }
+        }
+
+        fetchServerStatus();
+    </script>
+
+</body>
+</html>
