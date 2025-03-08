@@ -56,6 +56,12 @@
         button:hover {
             background-color: #45a049;
         }
+        .server-ip {
+            font-size: 18px;
+            font-weight: bold;
+            color: #4CAF50;
+            margin-top: 10px;
+        }
         @media (max-width: 600px) {
             body {
                 font-size: 16px;
@@ -75,6 +81,7 @@
         <div class="section">
             <h2>🌐 Server Status</h2>
             <p id="server-info">Fetching server data...</p>
+            <p class="server-ip">Server Address: <span id="server-address">minecraft.sbrandsborg.dk</span></p>
             <button onclick="copyIP()">Join Server</button>
         </div>
 
