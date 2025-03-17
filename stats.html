@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minecraft Spilletid</title>
+    <title>Minecraft Spillerstatistik</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; text-align: center; }
@@ -12,7 +12,7 @@
     </style>
 </head>
 <body>
-    <h1>Spilletid pr. Spiller (minutter)</h1>
+    <h1>Spilletid pr. Spiller (timer)</h1>
     <div class="chart-container">
         <canvas id="playtimeChart"></canvas>
     </div>
@@ -22,20 +22,20 @@
             try {
                 const response = await fetch("all_stats.json");
                 const data = await response.json();
-
+                
                 let players = [];
                 let playtimes = [];
 
-                data.forEach(player => {
-                    let playtimeTicks = player.Stats.stats["minecraft:custom"]["minecraft:play_time"] || 0;
-                    let playtimeMinutes = playtimeTicks / 1200; // Omregning fra ticks til minutter
+                for (const uuid in data.Players) {
+                    const player = data.Players[uuid];
+                    let playtimeTicks = player.Stats["minecraft:custom"]["minecraft:play_time"] || 0;
+                    let playtimeHours = playtimeTicks / 72000; // Omregning fra ticks til timer (20 ticks pr. sek, 3600 sek pr. time)
 
-                    players.push(player.UUID);
-                    playtimes.push(playtimeMinutes);
-                });
+                    players.push(player.Name);
+                    playtimes.push(playtimeHours);
+                }
 
                 createChart(players, playtimes);
-
             } catch (error) {
                 console.error("Fejl ved indlæsning af stats:", error);
             }
@@ -48,7 +48,7 @@
                 data: {
                     labels: players,
                     datasets: [{
-                        label: "Spilletid (minutter)",
+                        label: "Spilletid (timer)",
                         data: playtimes,
                         backgroundColor: "rgba(54, 162, 235, 0.6)",
                         borderColor: "rgba(54, 162, 235, 1)",
