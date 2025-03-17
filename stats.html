@@ -44,6 +44,10 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
             width: 250px;
         }
+        .players-container ul {
+            list-style-type: none;
+            padding: 0;
+        }
         .summary-text {
             margin-top: 20px;
             font-size: 18px;
@@ -85,12 +89,12 @@
                 <th>Time Played (Minutes)</th>
             </tr>
             <tr>
-                <td id="totalChestsLooted">0</td>
-                <td id="totalItemsInserted">0</td>
-                <td id="totalMobKills">0</td>
-                <td id="totalTimesJumped">0</td>
-                <td id="totalDeaths">0</td>
-                <td id="totalTimePlayed">0</td>
+                <td id="totalChestsLooted"></td>
+                <td id="totalItemsInserted"></td>
+                <td id="totalMobKills"></td>
+                <td id="totalTimesJumped"></td>
+                <td id="totalDeaths"></td>
+                <td id="totalTimePlayed"></td>
             </tr>
         </table>
         
@@ -131,19 +135,17 @@
                 document.getElementById('onlinePlayers').innerHTML = onlinePlayers.map(player => `<li>🟢 ${player}</li>`).join('');
                 document.getElementById('offlinePlayers').innerHTML = allPlayers.filter(player => !onlinePlayers.includes(player)).map(player => `<li>🔴 ${player}</li>`).join('');
                 
-                let totalChestsLooted = 0, totalItemsInserted = 0, totalMobKills = 0, totalTimesJumped = 0, totalDeaths = 0, totalTimePlayed = 0;
+                let highestXP = 0;
+                let mostExperienced = "Unknown";
                 
                 data.playerStats.forEach(player => {
-                    const stats = player.stats["minecraft:custom"] || {};
-                    totalChestsLooted += stats["minecraft:open_chest"] || 0;
-                    totalItemsInserted += stats["minecraft:items_inserted"] || 0;
-                    totalMobKills += stats["minecraft:mob_kills"] || 0;
-                    totalTimesJumped += stats["minecraft:jump"] || 0;
-                    totalDeaths += stats["minecraft:deaths"] || 0;
-                    totalTimePlayed += stats["minecraft:play_one_minute"] || 0;
+                    if (player.stats["minecraft:custom"]["minecraft:xp_total"] > highestXP) {
+                        highestXP = player.stats["minecraft:custom"]["minecraft:xp_total"];
+                        mostExperienced = player.playerName;
+                    }
                 });
                 
-                document.getElementById('summaryText').innerHTML = `🔥 The legend grows! Our heroes have looted <span class='highlight' title='Chests Looted'>${totalChestsLooted}</span> chests, stored <span class='highlight' title='Items Inserted (ME Network)'>${totalItemsInserted}</span> treasures in the ME vault, and slain <span class='highlight' title='Mob Kills'>${totalMobKills}</span> mighty foes. They have jumped <span class='highlight' title='Times Jumped'>${totalTimesJumped}</span> times, faced doom <span class='highlight' title='Deaths'>${totalDeaths}</span> times, and spent <span class='highlight' title='Time Played (Minutes)'>${Math.floor(totalTimePlayed / 20)}</span> minutes shaping this blocky world! 🏰🚀`;
+                document.getElementById('summaryText').innerHTML = `🔥 The legend grows! Our heroes have looted <span class='highlight'>${data.totalChestsLooted}</span> chests, stored <span class='highlight'>${data.totalItemsInserted}</span> treasures in the ME vault, and slain <span class='highlight'>${data.totalMobKills}</span> mighty foes. They have jumped <span class='highlight'>${data.totalTimesJumped}</span> times, faced doom <span class='highlight'>${data.totalDeaths}</span> times, and spent <span class='highlight'>${Math.floor(data.totalTimePlayed / 20)}</span> minutes shaping this blocky world! The most experienced player so far is **${mostExperienced}**, with **${highestXP} XP**! 🏆✨`;
             } catch (error) {
                 console.error('Error fetching stats:', error);
             }
