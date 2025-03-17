@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SBrandsborg Minecraft ATM 10 Server - Statistics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -43,8 +44,13 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
             width: 250px;
         }
-        .players strong {
-            color: #f1c40f;
+        .stats-container {
+            margin-left: 20px;
+            padding: 20px;
+            background: #3e3e3e;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            width: 400px;
         }
         a {
             color: #f1c40f;
@@ -61,8 +67,8 @@
             padding: 5px;
             border-radius: 5px;
         }
-        .online { color: #57F287; } /* Green for online */
-        .offline { color: #ED4245; } /* Red for offline */
+        .online { color: #57F287; }
+        .offline { color: #ED4245; }
     </style>
 </head>
 <body>
@@ -82,6 +88,11 @@
         <ul id="offlinePlayers"></ul>
     </div>
 
+    <div class="stats-container">
+        <h2>📊 Server Statistics</h2>
+        <canvas id="statsChart"></canvas>
+    </div>
+
     <script>
         async function fetchStats() {
             try {
@@ -94,36 +105,66 @@
                 const timeParts = data.currentInGameTime.split(':');
                 const hours = parseInt(timeParts[0]);
                 
-                let dayNightText = "";
-                if (hours >= 6 && hours < 18) {
-                    dayNightText = "☀️ Daytime in the Overworld";
-                } else {
-                    dayNightText = "🌙 Nighttime in the Overworld";
-                }
+                let dayNightText = hours >= 6 && hours < 18 ? "☀️ Daytime in the Overworld" : "🌙 Nighttime in the Overworld";
                 document.getElementById('dayNight').textContent = dayNightText;
                 
-                // Extract all players from playerStats
                 const allPlayers = data.playerStats.map(player => player.playerName);
                 const onlinePlayers = data.onlinePlayers;
                 
-                // Online Players
-                const onlinePlayersList = document.getElementById('onlinePlayers');
-                onlinePlayersList.innerHTML = "";
-                onlinePlayers.forEach(player => {
-                    const li = document.createElement('li');
-                    li.textContent = player;
-                    li.classList.add('online');
-                    onlinePlayersList.appendChild(li);
+                document.getElementById('onlinePlayers').innerHTML = onlinePlayers.map(player => `<li class='online'>${player}</li>`).join('');
+                document.getElementById('offlinePlayers').innerHTML = allPlayers.filter(player => !onlinePlayers.includes(player)).map(player => `<li class='offline'>${player}</li>`).join('');
+                
+                // Collecting statistics
+                let totalChestsLooted = 0;
+                let totalItemsInserted = 0;
+                let totalMobKills = 0;
+                let playerStats = {};
+                
+                data.playerStats.forEach(player => {
+                    const playerName = player.playerName;
+                    const stats = player.stats["minecraft:custom"] || {};
+                    
+                    const chestsLooted = stats["minecraft:open_chest"] || 0;
+                    const itemsInserted = stats["minecraft:items_inserted"] || 0;
+                    const mobKills = stats["minecraft:mob_kills"] || 0;
+                    
+                    totalChestsLooted += chestsLooted;
+                    totalItemsInserted += itemsInserted;
+                    totalMobKills += mobKills;
+                    
+                    playerStats[playerName] = { chestsLooted, itemsInserted, mobKills };
                 });
                 
-                // Offline Players
-                const offlinePlayersList = document.getElementById('offlinePlayers');
-                offlinePlayersList.innerHTML = "";
-                allPlayers.filter(player => !onlinePlayers.includes(player)).forEach(player => {
-                    const li = document.createElement('li');
-                    li.textContent = player;
-                    li.classList.add('offline');
-                    offlinePlayersList.appendChild(li);
+                // Chart setup
+                const ctx = document.getElementById('statsChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(playerStats),
+                        datasets: [
+                            {
+                                label: 'Chests Looted',
+                                data: Object.values(playerStats).map(p => p.chestsLooted),
+                                backgroundColor: '#f39c12'
+                            },
+                            {
+                                label: 'Items Inserted',
+                                data: Object.values(playerStats).map(p => p.itemsInserted),
+                                backgroundColor: '#3498db'
+                            },
+                            {
+                                label: 'Mob Kills',
+                                data: Object.values(playerStats).map(p => p.mobKills),
+                                backgroundColor: '#e74c3c'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: { beginAtZero: true }
+                        }
+                    }
                 });
             } catch (error) {
                 console.error('Error fetching stats:', error);
@@ -131,7 +172,7 @@
         }
 
         fetchStats();
-        setInterval(fetchStats, 900000); // Update every 15 minutes
+        setInterval(fetchStats, 900000);
     </script>
 </body>
 </html>
