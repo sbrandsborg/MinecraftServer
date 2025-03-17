@@ -133,7 +133,14 @@
                 const response = await fetch('Get-MCStats.json');
                 const data = await response.json();
                 
+                document.getElementById('days').textContent = data.inGameDays || "0";
+                document.getElementById('time').textContent = data.currentInGameTime || "00:00";
+                document.getElementById('dayNight').textContent = parseInt(data.currentInGameTime?.split(':')[0]) >= 6 && parseInt(data.currentInGameTime?.split(':')[0]) < 18 ? "☀️ Daytime in the Overworld" : "🌙 Nighttime in the Overworld";
+                
                 document.getElementById('summaryText').innerHTML = `🔥 The legend grows! Players have mined <span class='highlight'>${data.totalBlocksMined || 0}</span> blocks, looted <span class='highlight'>${data.totalChestsLooted || 0}</span> chests, stored <span class='highlight'>${data.totalItemsInserted || 0}</span> treasures, and slain <span class='highlight'>${data.totalMobKills || 0}</span> mighty foes. They have jumped <span class='highlight'>${data.totalTimesJumped || 0}</span> times, faced doom <span class='highlight'>${data.totalDeaths || 0}</span> times, and spent <span class='highlight'>${Math.floor(data.totalTimePlayed / 20) || 0}</span> minutes shaping this blocky world! 🏰🚀`;
+                
+                document.getElementById('onlinePlayers').innerHTML = data.onlinePlayers.map(player => `<li>${player}</li>`).join('');
+                document.getElementById('offlinePlayers').innerHTML = data.offlinePlayers.map(player => `<li>${player}</li>`).join('');
             } catch (error) {
                 console.error('Error fetching stats:', error);
             }
