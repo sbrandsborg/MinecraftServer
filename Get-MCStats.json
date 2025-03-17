@@ -1,12 +1,18 @@
 ﻿{
+<<<<<<< HEAD
     "inGameDays":  928,
     "currentInGameTime":  "23:51",
+=======
+    "inGameDays":  929,
+    "currentInGameTime":  "23:49",
+>>>>>>> 41e6f12 (Update stats at 2025-03-17 16:41:13)
     "worldSizeGB":  5.41,
     "onlinePlayers":  [
                           "gtav6000",
                           "SBrandsborg"
                       ],
     "playerStats":  [
+<<<<<<< HEAD
                         {
                             "inGameDays":  0,
                             "currentInGameTime":  {
@@ -18,5 +24,8 @@
                             "playerName":  "all_stats",
                             "uuid":  "all_stats"
                         }
+=======
+
+>>>>>>> 41e6f12 (Update stats at 2025-03-17 16:41:13)
                     ]
 }
