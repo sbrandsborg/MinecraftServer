@@ -1,0 +1,22 @@
+﻿{
+    "inGameDays":  928,
+    "currentInGameTime":  "23:51",
+    "worldSizeGB":  5.41,
+    "onlinePlayers":  [
+                          "gtav6000",
+                          "SBrandsborg"
+                      ],
+    "playerStats":  [
+                        {
+                            "inGameDays":  0,
+                            "currentInGameTime":  {
+
+                                                  },
+                            "playerStats":  [
+
+                                            ],
+                            "playerName":  "all_stats",
+                            "uuid":  "all_stats"
+                        }
+                    ]
+}
