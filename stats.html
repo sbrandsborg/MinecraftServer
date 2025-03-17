@@ -17,40 +17,32 @@
             justify-content: center;
         }
         .container {
-            max-width: 600px;
-            padding: 20px;
-            background: #3e3e3e; /* Minecraft Stone Gray */
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            text-align: center;
-        }
-        .day-night {
-            font-size: 24px;
-            font-weight: bold;
-            padding: 10px;
-            margin-top: 10px;
-        }
-        .header {
-            font-size: 28px;
-            font-weight: bold;
-            color: #daa520; /* Minecraft Gold */
-            text-shadow: 2px 2px #000;
-        }
-        .players-container {
-            margin-left: 20px;
-            padding: 20px;
-            background: #23272a; /* Discord-like panel */
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            width: 250px;
-        }
-        .stats-container {
-            margin-left: 20px;
+            max-width: 700px;
             padding: 20px;
             background: #3e3e3e;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            width: 400px;
+            text-align: center;
+        }
+        .stats-summary {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        .stats-summary th, .stats-summary td {
+            border: 1px solid #fff;
+            padding: 10px;
+        }
+        .chart-container {
+            margin-top: 20px;
+        }
+        .players-container {
+            margin-left: 20px;
+            padding: 20px;
+            background: #23272a;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            width: 250px;
         }
         a {
             color: #f1c40f;
@@ -59,16 +51,6 @@
         a:hover {
             text-decoration: underline;
         }
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        li {
-            padding: 5px;
-            border-radius: 5px;
-        }
-        .online { color: #57F287; }
-        .offline { color: #ED4245; }
     </style>
 </head>
 <body>
@@ -79,6 +61,26 @@
         <p><strong>⏳ In-Game Time:</strong> <span id="time"></span></p>
         <p><strong>📅 Days Passed:</strong> <span id="days"></span></p>
         <p class="day-night" id="dayNight"></p>
+        
+        <h2>📊 Server Summary</h2>
+        <table class="stats-summary">
+            <tr>
+                <th>Chests Looted</th>
+                <th>Items Inserted (ME Network)</th>
+                <th>Mob Kills</th>
+            </tr>
+            <tr>
+                <td id="totalChestsLooted">0</td>
+                <td id="totalItemsInserted">0</td>
+                <td id="totalMobKills">0</td>
+            </tr>
+        </table>
+        
+        <div class="chart-container">
+            <canvas id="chestsChart"></canvas>
+            <canvas id="itemsChart"></canvas>
+            <canvas id="mobsChart"></canvas>
+        </div>
     </div>
     
     <div class="players-container">
@@ -86,11 +88,6 @@
         <ul id="onlinePlayers"></ul>
         <p><strong>🔴 Offline Players:</strong></p>
         <ul id="offlinePlayers"></ul>
-    </div>
-
-    <div class="stats-container">
-        <h2>📊 Server Statistics</h2>
-        <canvas id="statsChart"></canvas>
     </div>
 
     <script>
@@ -104,9 +101,7 @@
                 
                 const timeParts = data.currentInGameTime.split(':');
                 const hours = parseInt(timeParts[0]);
-                
-                let dayNightText = hours >= 6 && hours < 18 ? "☀️ Daytime in the Overworld" : "🌙 Nighttime in the Overworld";
-                document.getElementById('dayNight').textContent = dayNightText;
+                document.getElementById('dayNight').textContent = hours >= 6 && hours < 18 ? "☀️ Daytime in the Overworld" : "🌙 Nighttime in the Overworld";
                 
                 const allPlayers = data.playerStats.map(player => player.playerName);
                 const onlinePlayers = data.onlinePlayers;
@@ -114,16 +109,11 @@
                 document.getElementById('onlinePlayers').innerHTML = onlinePlayers.map(player => `<li class='online'>${player}</li>`).join('');
                 document.getElementById('offlinePlayers').innerHTML = allPlayers.filter(player => !onlinePlayers.includes(player)).map(player => `<li class='offline'>${player}</li>`).join('');
                 
-                // Collecting statistics
-                let totalChestsLooted = 0;
-                let totalItemsInserted = 0;
-                let totalMobKills = 0;
+                let totalChestsLooted = 0, totalItemsInserted = 0, totalMobKills = 0;
                 let playerStats = {};
                 
                 data.playerStats.forEach(player => {
-                    const playerName = player.playerName;
                     const stats = player.stats["minecraft:custom"] || {};
-                    
                     const chestsLooted = stats["minecraft:open_chest"] || 0;
                     const itemsInserted = stats["minecraft:items_inserted"] || 0;
                     const mobKills = stats["minecraft:mob_kills"] || 0;
@@ -132,40 +122,24 @@
                     totalItemsInserted += itemsInserted;
                     totalMobKills += mobKills;
                     
-                    playerStats[playerName] = { chestsLooted, itemsInserted, mobKills };
+                    playerStats[player.playerName] = { chestsLooted, itemsInserted, mobKills };
                 });
                 
-                // Chart setup
-                const ctx = document.getElementById('statsChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: Object.keys(playerStats),
-                        datasets: [
-                            {
-                                label: 'Chests Looted',
-                                data: Object.values(playerStats).map(p => p.chestsLooted),
-                                backgroundColor: '#f39c12'
-                            },
-                            {
-                                label: 'Items Inserted',
-                                data: Object.values(playerStats).map(p => p.itemsInserted),
-                                backgroundColor: '#3498db'
-                            },
-                            {
-                                label: 'Mob Kills',
-                                data: Object.values(playerStats).map(p => p.mobKills),
-                                backgroundColor: '#e74c3c'
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            y: { beginAtZero: true }
-                        }
-                    }
-                });
+                document.getElementById('totalChestsLooted').textContent = totalChestsLooted;
+                document.getElementById('totalItemsInserted').textContent = totalItemsInserted;
+                document.getElementById('totalMobKills').textContent = totalMobKills;
+                
+                const createChart = (canvasId, label, data, color) => {
+                    new Chart(document.getElementById(canvasId).getContext('2d'), {
+                        type: 'bar',
+                        data: { labels: Object.keys(playerStats), datasets: [{ label, data: Object.values(playerStats).map(p => p[label]), backgroundColor: color }] },
+                        options: { responsive: true, scales: { y: { beginAtZero: true } } }
+                    });
+                };
+                
+                createChart('chestsChart', 'Chests Looted', Object.values(playerStats).map(p => p.chestsLooted), '#f39c12');
+                createChart('itemsChart', 'Items Inserted (ME Network)', Object.values(playerStats).map(p => p.itemsInserted), '#3498db');
+                createChart('mobsChart', 'Mob Kills', Object.values(playerStats).map(p => p.mobKills), '#e74c3c');
             } catch (error) {
                 console.error('Error fetching stats:', error);
             }
