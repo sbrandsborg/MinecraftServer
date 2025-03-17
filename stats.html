@@ -1,70 +1,69 @@
 <!DOCTYPE html>
-<html lang="da">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minecraft Spillerstatistik</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>SBrandsborg Minecraft ATM 10 Server</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; text-align: center; }
-        h1 { margin-bottom: 20px; }
-        .chart-container { width: 80%; max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: #fff;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background: #222;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        .day-night {
+            font-size: 24px;
+            font-weight: bold;
+            padding: 10px;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
-    <h1>Spilletid pr. Spiller (timer)</h1>
-    <div class="chart-container">
-        <canvas id="playtimeChart"></canvas>
+    <h1>SBrandsborg Minecraft ATM 10 Server</h1>
+    <p>Updated every 15 minutes</p>
+    <div class="container">
+        <p><strong>In-Game Time:</strong> <span id="time"></span></p>
+        <p><strong>Days Passed:</strong> <span id="days"></span></p>
+        <p class="day-night" id="dayNight"></p>
     </div>
 
     <script>
-        async function loadStats() {
+        async function fetchStats() {
             try {
-                const response = await fetch("all_stats.json");
+                const response = await fetch('Get-MCStats.json');
                 const data = await response.json();
                 
-                let players = [];
-                let playtimes = [];
-
-                for (const uuid in data.Players) {
-                    const player = data.Players[uuid];
-                    let playtimeTicks = player.Stats["minecraft:custom"]["minecraft:play_time"] || 0;
-                    let playtimeHours = playtimeTicks / 72000; // Omregning fra ticks til timer (20 ticks pr. sek, 3600 sek pr. time)
-
-                    players.push(player.Name);
-                    playtimes.push(playtimeHours);
+                document.getElementById('time').textContent = data.currentInGameTime;
+                document.getElementById('days').textContent = data.inGameDays;
+                
+                const timeParts = data.currentInGameTime.split(':');
+                const hours = parseInt(timeParts[0]);
+                
+                let dayNightText = "";
+                if (hours >= 6 && hours < 18) {
+                    dayNightText = "☀️ Daytime in the Overworld";
+                } else {
+                    dayNightText = "🌙 Nighttime in the Overworld";
                 }
-
-                createChart(players, playtimes);
+                document.getElementById('dayNight').textContent = dayNightText;
             } catch (error) {
-                console.error("Fejl ved indlæsning af stats:", error);
+                console.error('Error fetching stats:', error);
             }
         }
 
-        function createChart(players, playtimes) {
-            const ctx = document.getElementById("playtimeChart").getContext("2d");
-            new Chart(ctx, {
-                type: "bar",
-                data: {
-                    labels: players,
-                    datasets: [{
-                        label: "Spilletid (timer)",
-                        data: playtimes,
-                        backgroundColor: "rgba(54, 162, 235, 0.6)",
-                        borderColor: "rgba(54, 162, 235, 1)",
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: { beginAtZero: true }
-                    }
-                }
-            });
-        }
-
-        loadStats();
+        fetchStats();
+        setInterval(fetchStats, 900000); // Update every 15 minutes
     </script>
 </body>
 </html>
