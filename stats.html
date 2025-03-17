@@ -24,6 +24,12 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
             text-align: center;
         }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
         .stats-summary {
             width: 100%;
             margin-top: 20px;
@@ -69,8 +75,10 @@
 <body>
     <div class="container">
         <h1 class="header">⛏️ SBrandsborg Minecraft ATM 10 Server - Statistics ⛏️</h1>
-        <p>🔄 Updated every 15 minutes</p>
-        <p><a href="https://sbrandsborg.github.io/MinecraftServer/">🏠 Return to Main Page</a></p>
+        <div class="top-bar">
+            <a href="https://sbrandsborg.github.io/MinecraftServer/">🏠 Return to Main Page</a>
+            <p>🔄 Updated every 15 minutes</p>
+        </div>
         
         <h2>🌍 Server Overview</h2>
         <p>For <strong><span id="days"></span></strong> in-game days, adventurers have roamed the land. The sun rises, mobs lurk at night, and right now, it's <span id="dayNight"></span>. The in-game clock strikes <strong><span id="time"></span></strong> – another day of adventure begins! ⛏️🌞🌙</p>
@@ -87,6 +95,7 @@
                 <th>Times Jumped</th>
                 <th>Deaths</th>
                 <th>Time Played (Minutes)</th>
+                <th>Blocks Mined</th>
             </tr>
             <tr>
                 <td id="totalChestsLooted"></td>
@@ -95,6 +104,7 @@
                 <td id="totalTimesJumped"></td>
                 <td id="totalDeaths"></td>
                 <td id="totalTimePlayed"></td>
+                <td id="totalBlocksMined"></td>
             </tr>
         </table>
         
@@ -106,53 +116,15 @@
             <canvas id="jumpsChart"></canvas>
             <canvas id="deathsChart"></canvas>
             <canvas id="timePlayedChart"></canvas>
+            <canvas id="blocksMinedChart"></canvas>
         </div>
     </div>
     
     <div class="players-container">
-        <p><strong>🟢 Online Players:</strong></p>
+        <p><strong>Online Players</strong></p>
         <ul id="onlinePlayers"></ul>
-        <p><strong>🔴 Offline Players:</strong></p>
+        <p><strong>Offline Players</strong></p>
         <ul id="offlinePlayers"></ul>
     </div>
-
-    <script>
-        async function fetchStats() {
-            try {
-                const response = await fetch('Get-MCStats.json');
-                const data = await response.json();
-                
-                document.getElementById('time').textContent = data.currentInGameTime;
-                document.getElementById('days').textContent = data.inGameDays;
-                
-                const timeParts = data.currentInGameTime.split(':');
-                const hours = parseInt(timeParts[0]);
-                document.getElementById('dayNight').textContent = hours >= 6 && hours < 18 ? "☀️ Daytime in the Overworld" : "🌙 Nighttime in the Overworld";
-                
-                const onlinePlayers = data.onlinePlayers || [];
-                const allPlayers = data.playerStats.map(player => player.playerName);
-                
-                document.getElementById('onlinePlayers').innerHTML = onlinePlayers.map(player => `<li>🟢 ${player}</li>`).join('');
-                document.getElementById('offlinePlayers').innerHTML = allPlayers.filter(player => !onlinePlayers.includes(player)).map(player => `<li>🔴 ${player}</li>`).join('');
-                
-                let highestXP = 0;
-                let mostExperienced = "Unknown";
-                
-                data.playerStats.forEach(player => {
-                    if (player.stats["minecraft:custom"]["minecraft:xp_total"] > highestXP) {
-                        highestXP = player.stats["minecraft:custom"]["minecraft:xp_total"];
-                        mostExperienced = player.playerName;
-                    }
-                });
-                
-                document.getElementById('summaryText').innerHTML = `🔥 The legend grows! Our heroes have looted <span class='highlight'>${data.totalChestsLooted}</span> chests, stored <span class='highlight'>${data.totalItemsInserted}</span> treasures in the ME vault, and slain <span class='highlight'>${data.totalMobKills}</span> mighty foes. They have jumped <span class='highlight'>${data.totalTimesJumped}</span> times, faced doom <span class='highlight'>${data.totalDeaths}</span> times, and spent <span class='highlight'>${Math.floor(data.totalTimePlayed / 20)}</span> minutes shaping this blocky world! The most experienced player so far is **${mostExperienced}**, with **${highestXP} XP**! 🏆✨`;
-            } catch (error) {
-                console.error('Error fetching stats:', error);
-            }
-        }
-
-        fetchStats();
-        setInterval(fetchStats, 900000);
-    </script>
 </body>
 </html>
