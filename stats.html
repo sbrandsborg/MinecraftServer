@@ -8,7 +8,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #2c2f33; /* Neutral Discord-like background */
+            background-color: #2c2f33;
             color: #fff;
             margin: 0;
             padding: 20px;
@@ -68,11 +68,17 @@
                 <th>Chests Looted</th>
                 <th>Items Inserted (ME Network)</th>
                 <th>Mob Kills</th>
+                <th>Times Jumped</th>
+                <th>Deaths</th>
+                <th>Time Played (Minutes)</th>
             </tr>
             <tr>
                 <td id="totalChestsLooted">0</td>
                 <td id="totalItemsInserted">0</td>
                 <td id="totalMobKills">0</td>
+                <td id="totalTimesJumped">0</td>
+                <td id="totalDeaths">0</td>
+                <td id="totalTimePlayed">0</td>
             </tr>
         </table>
         
@@ -80,6 +86,9 @@
             <canvas id="chestsChart"></canvas>
             <canvas id="itemsChart"></canvas>
             <canvas id="mobsChart"></canvas>
+            <canvas id="jumpsChart"></canvas>
+            <canvas id="deathsChart"></canvas>
+            <canvas id="timePlayedChart"></canvas>
         </div>
     </div>
     
@@ -109,7 +118,7 @@
                 document.getElementById('onlinePlayers').innerHTML = onlinePlayers.map(player => `<li class='online'>${player}</li>`).join('');
                 document.getElementById('offlinePlayers').innerHTML = allPlayers.filter(player => !onlinePlayers.includes(player)).map(player => `<li class='offline'>${player}</li>`).join('');
                 
-                let totalChestsLooted = 0, totalItemsInserted = 0, totalMobKills = 0;
+                let totalChestsLooted = 0, totalItemsInserted = 0, totalMobKills = 0, totalTimesJumped = 0, totalDeaths = 0, totalTimePlayed = 0;
                 let playerStats = {};
                 
                 data.playerStats.forEach(player => {
@@ -117,29 +126,26 @@
                     const chestsLooted = stats["minecraft:open_chest"] || 0;
                     const itemsInserted = stats["minecraft:items_inserted"] || 0;
                     const mobKills = stats["minecraft:mob_kills"] || 0;
+                    const timesJumped = stats["minecraft:jump"] || 0;
+                    const deaths = stats["minecraft:deaths"] || 0;
+                    const timePlayed = stats["minecraft:play_one_minute"] || 0;
                     
                     totalChestsLooted += chestsLooted;
                     totalItemsInserted += itemsInserted;
                     totalMobKills += mobKills;
+                    totalTimesJumped += timesJumped;
+                    totalDeaths += deaths;
+                    totalTimePlayed += timePlayed;
                     
-                    playerStats[player.playerName] = { chestsLooted, itemsInserted, mobKills };
+                    playerStats[player.playerName] = { chestsLooted, itemsInserted, mobKills, timesJumped, deaths, timePlayed };
                 });
                 
                 document.getElementById('totalChestsLooted').textContent = totalChestsLooted;
                 document.getElementById('totalItemsInserted').textContent = totalItemsInserted;
                 document.getElementById('totalMobKills').textContent = totalMobKills;
-                
-                const createChart = (canvasId, label, data, color) => {
-                    new Chart(document.getElementById(canvasId).getContext('2d'), {
-                        type: 'bar',
-                        data: { labels: Object.keys(playerStats), datasets: [{ label, data: Object.values(playerStats).map(p => p[label]), backgroundColor: color }] },
-                        options: { responsive: true, scales: { y: { beginAtZero: true } } }
-                    });
-                };
-                
-                createChart('chestsChart', 'Chests Looted', Object.values(playerStats).map(p => p.chestsLooted), '#f39c12');
-                createChart('itemsChart', 'Items Inserted (ME Network)', Object.values(playerStats).map(p => p.itemsInserted), '#3498db');
-                createChart('mobsChart', 'Mob Kills', Object.values(playerStats).map(p => p.mobKills), '#e74c3c');
+                document.getElementById('totalTimesJumped').textContent = totalTimesJumped;
+                document.getElementById('totalDeaths').textContent = totalDeaths;
+                document.getElementById('totalTimePlayed').textContent = totalTimePlayed;
             } catch (error) {
                 console.error('Error fetching stats:', error);
             }
