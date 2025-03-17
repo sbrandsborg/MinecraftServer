@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Server Stats</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
+        h1 { text-align: center; }
+        table { width: 100%; border-collapse: collapse; background: white; margin-bottom: 20px; }
+        th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }
+        th { background: #333; color: white; }
+        tr:nth-child(even) { background: #f2f2f2; }
+        .chart-container { width: 80%; margin: auto; }
+    </style>
+</head>
+<body>
+    <h1>Minecraft Server Stats</h1>
+    
+    <div class="chart-container">
+        <canvas id="playtimeChart"></canvas>
+    </div>
+    
+    <div class="chart-container">
+        <canvas id="killsChart"></canvas>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Spiller UUID</th>
+                <th>Statistik</th>
+            </tr>
+        </thead>
+        <tbody id="statsTable">
+            <tr><td colspan="2">Indlæser data...</td></tr>
+        </tbody>
+    </table>
+
+    <script>
+        async function loadStats() {
+            try {
+                const response = await fetch("all_stats.json");
+                const data = await response.json();
+                const tableBody = document.getElementById("statsTable");
+                tableBody.innerHTML = ""; // Ryd placeholder
+
+                let players = [];
+                let playtimes = [];
+                let zombieKills = [];
+
+                data.forEach(player => {
+                    const row = document.createElement("tr");
+                    const uuidCell = document.createElement("td");
+                    uuidCell.textContent = player.UUID;
+
+                    const statsCell = document.createElement("td");
+                    statsCell.innerHTML = JSON.stringify(player.Stats, null, 2)
+                        .replace(/\n/g, "<br>")
+                        .replace(/\s/g, "&nbsp;");
+
+                    row.appendChild(uuidCell);
+                    row.appendChild(statsCell);
+                    tableBody.appendChild(row);
+
+                    // Hent specifikke statistikker til grafer
+                    players.push(player.UUID);
+                    playtimes.push((player.Stats["stat.playOneMinute"] || 0) / 1200); // Omregnet fra ticks til minutter
+                    zombieKills.push(player.Stats["stat.killEntity.Zombie"] || 0);
+                });
+
+                createChart("playtimeChart", "Tid spillet (minutter)", players, playtimes, "rgba(54, 162, 235, 0.6)");
+                createChart("killsChart", "Dræbte zombier", players, zombieKills, "rgba(255, 99, 132, 0.6)");
+
+            } catch (error) {
+                console.error("Fejl ved indlæsning af stats:", error);
+                document.getElementById("statsTable").innerHTML = "<tr><td colspan='2'>Fejl ved indlæsning af data.</td></tr>";
+            }
+        }
+
+        function createChart(canvasId, label, labels, data, color) {
+            const ctx = document.getElementById(canvasId).getContext("2d");
+            new Chart(ctx, {
+                type: "bar",
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: label,
+                        data: data,
+                        backgroundColor: color,
+                        borderColor: color.replace("0.6", "1"),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        loadStats();
+    </script>
+</body>
+</html>
