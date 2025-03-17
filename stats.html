@@ -81,10 +81,10 @@
         </div>
         
         <h2>🌍 Server Overview</h2>
-        <p>For <strong><span id="days"></span></strong> in-game days, adventurers have roamed the land. The sun rises, mobs lurk at night, and right now, it's <span id="dayNight"></span>. The in-game clock strikes <strong><span id="time"></span></strong> – another day of adventure begins! ⛏️🌞🌙</p>
+        <p>For <strong><span id="days">0</span></strong> in-game days, adventurers have roamed the land. The sun rises, mobs lurk at night, and right now, it's <span id="dayNight">unknown</span>. The in-game clock strikes <strong><span id="time">00:00</span></strong> – another day of adventure begins! ⛏️🌞🌙</p>
         
         <h2>📜 The Epic Saga Continues...</h2>
-        <p class="summary-text" id="summaryText"></p>
+        <p class="summary-text" id="summaryText">Loading data...</p>
         
         <h2>📊 Server Summary</h2>
         <table class="stats-summary">
@@ -98,13 +98,13 @@
                 <th>Blocks Mined</th>
             </tr>
             <tr>
-                <td id="totalChestsLooted"></td>
-                <td id="totalItemsInserted"></td>
-                <td id="totalMobKills"></td>
-                <td id="totalTimesJumped"></td>
-                <td id="totalDeaths"></td>
-                <td id="totalTimePlayed"></td>
-                <td id="totalBlocksMined"></td>
+                <td id="totalChestsLooted">0</td>
+                <td id="totalItemsInserted">0</td>
+                <td id="totalMobKills">0</td>
+                <td id="totalTimesJumped">0</td>
+                <td id="totalDeaths">0</td>
+                <td id="totalTimePlayed">0</td>
+                <td id="totalBlocksMined">0</td>
             </tr>
         </table>
         
@@ -126,5 +126,32 @@
         <p><strong>Offline Players</strong></p>
         <ul id="offlinePlayers"></ul>
     </div>
+
+    <script>
+        async function fetchStats() {
+            try {
+                const response = await fetch('Get-MCStats.json');
+                const data = await response.json();
+                
+                document.getElementById('time').textContent = data.currentInGameTime || "00:00";
+                document.getElementById('days').textContent = data.inGameDays || "0";
+                document.getElementById('dayNight').textContent = data.currentInGameTime && parseInt(data.currentInGameTime.split(':')[0]) >= 6 && parseInt(data.currentInGameTime.split(':')[0]) < 18 ? "☀️ Daytime in the Overworld" : "🌙 Nighttime in the Overworld";
+                
+                document.getElementById('totalChestsLooted').textContent = data.totalChestsLooted || "0";
+                document.getElementById('totalItemsInserted').textContent = data.totalItemsInserted || "0";
+                document.getElementById('totalMobKills').textContent = data.totalMobKills || "0";
+                document.getElementById('totalTimesJumped').textContent = data.totalTimesJumped || "0";
+                document.getElementById('totalDeaths').textContent = data.totalDeaths || "0";
+                document.getElementById('totalTimePlayed').textContent = data.totalTimePlayed ? Math.floor(data.totalTimePlayed / 20) : "0";
+                document.getElementById('totalBlocksMined').textContent = data.totalBlocksMined || "0";
+                
+                document.getElementById('summaryText').textContent = "🔥 The legend grows! Players have mined " + data.totalBlocksMined + " blocks, looted " + data.totalChestsLooted + " chests, stored " + data.totalItemsInserted + " treasures, and slain " + data.totalMobKills + " mighty foes!";
+            } catch (error) {
+                console.error('Error fetching stats:', error);
+            }
+        }
+        fetchStats();
+        setInterval(fetchStats, 900000);
+    </script>
 </body>
 </html>
