@@ -69,9 +69,9 @@
         <p><a href="https://sbrandsborg.github.io/MinecraftServer/">🏠 Return to Main Page</a></p>
         
         <h2>🌍 Server Overview</h2>
-        <p>The world has been alive for <strong><span id="days"></span></strong> days. The sun rises and sets, and right now it's <span id="dayNight"></span>. The in-game clock shows <strong><span id="time"></span></strong> – time to adventure! ⛏️</p>
+        <p>For <strong><span id="days"></span></strong> in-game days, adventurers have roamed the land. The sun rises, mobs lurk at night, and right now, it's <span id="dayNight"></span>. The in-game clock strikes <strong><span id="time"></span></strong> – another day of adventure begins! ⛏️🌞🌙</p>
         
-        <h2>📜 A Tale of the Server</h2>
+        <h2>📜 The Epic Saga Continues...</h2>
         <p class="summary-text" id="summaryText"></p>
         
         <h2>📊 Server Summary</h2>
@@ -125,6 +125,12 @@
                 const hours = parseInt(timeParts[0]);
                 document.getElementById('dayNight').textContent = hours >= 6 && hours < 18 ? "☀️ Daytime in the Overworld" : "🌙 Nighttime in the Overworld";
                 
+                const onlinePlayers = data.onlinePlayers || [];
+                const allPlayers = data.playerStats.map(player => player.playerName);
+                
+                document.getElementById('onlinePlayers').innerHTML = onlinePlayers.map(player => `<li>🟢 ${player}</li>`).join('');
+                document.getElementById('offlinePlayers').innerHTML = allPlayers.filter(player => !onlinePlayers.includes(player)).map(player => `<li>🔴 ${player}</li>`).join('');
+                
                 let totalChestsLooted = 0, totalItemsInserted = 0, totalMobKills = 0, totalTimesJumped = 0, totalDeaths = 0, totalTimePlayed = 0;
                 
                 data.playerStats.forEach(player => {
@@ -137,7 +143,7 @@
                     totalTimePlayed += stats["minecraft:play_one_minute"] || 0;
                 });
                 
-                document.getElementById('summaryText').innerHTML = `Once upon a time, in a land of blocks, brave adventurers looted <span class='highlight' title='Chests Looted'>${totalChestsLooted}</span> chests, stored <span class='highlight' title='Items Inserted (ME Network)'>${totalItemsInserted}</span> items in the great ME vault, and defeated <span class='highlight' title='Mob Kills'>${totalMobKills}</span> foes. They leaped <span class='highlight' title='Times Jumped'>${totalTimesJumped}</span> times in joy (or fear), met their fate <span class='highlight' title='Deaths'>${totalDeaths}</span> times, and spent <span class='highlight' title='Time Played (Minutes)'>${Math.floor(totalTimePlayed / 20)}</span> minutes shaping the world!`;
+                document.getElementById('summaryText').innerHTML = `🔥 The legend grows! Our heroes have looted <span class='highlight' title='Chests Looted'>${totalChestsLooted}</span> chests, stored <span class='highlight' title='Items Inserted (ME Network)'>${totalItemsInserted}</span> treasures in the ME vault, and slain <span class='highlight' title='Mob Kills'>${totalMobKills}</span> mighty foes. They have jumped <span class='highlight' title='Times Jumped'>${totalTimesJumped}</span> times, faced doom <span class='highlight' title='Deaths'>${totalDeaths}</span> times, and spent <span class='highlight' title='Time Played (Minutes)'>${Math.floor(totalTimePlayed / 20)}</span> minutes shaping this blocky world! 🏰🚀`;
             } catch (error) {
                 console.error('Error fetching stats:', error);
             }
