@@ -44,6 +44,10 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
             width: 250px;
         }
+        .summary-text {
+            margin-top: 20px;
+            font-size: 18px;
+        }
         a {
             color: #f1c40f;
             text-decoration: none;
@@ -58,11 +62,13 @@
         <h1 class="header">⛏️ SBrandsborg Minecraft ATM 10 Server - Statistics ⛏️</h1>
         <p>🔄 Updated every 15 minutes</p>
         <p><a href="https://sbrandsborg.github.io/MinecraftServer/">🏠 Return to Main Page</a></p>
-        <p><strong>⏳ In-Game Time:</strong> <span id="time"></span></p>
-        <p><strong>📅 Days Passed:</strong> <span id="days"></span></p>
-        <p class="day-night" id="dayNight"></p>
+        
+        <h2>🌍 Server Overview</h2>
+        <p>The server has been running for <strong><span id="days"></span></strong> days, and the in-game time is currently <strong><span id="time"></span></strong>. Right now, it's <span id="dayNight"></span>.</p>
         
         <h2>📊 Server Summary</h2>
+        <p class="summary-text" id="summaryText"></p>
+        
         <table class="stats-summary">
             <tr>
                 <th>Chests Looted</th>
@@ -82,6 +88,7 @@
             </tr>
         </table>
         
+        <h2>📈 Player Statistics</h2>
         <div class="chart-container">
             <canvas id="chestsChart"></canvas>
             <canvas id="itemsChart"></canvas>
@@ -112,32 +119,16 @@
                 const hours = parseInt(timeParts[0]);
                 document.getElementById('dayNight').textContent = hours >= 6 && hours < 18 ? "☀️ Daytime in the Overworld" : "🌙 Nighttime in the Overworld";
                 
-                const allPlayers = data.playerStats.map(player => player.playerName);
-                const onlinePlayers = data.onlinePlayers;
-                
-                document.getElementById('onlinePlayers').innerHTML = onlinePlayers.map(player => `<li class='online'>${player}</li>`).join('');
-                document.getElementById('offlinePlayers').innerHTML = allPlayers.filter(player => !onlinePlayers.includes(player)).map(player => `<li class='offline'>${player}</li>`).join('');
-                
                 let totalChestsLooted = 0, totalItemsInserted = 0, totalMobKills = 0, totalTimesJumped = 0, totalDeaths = 0, totalTimePlayed = 0;
-                let playerStats = {};
                 
                 data.playerStats.forEach(player => {
                     const stats = player.stats["minecraft:custom"] || {};
-                    const chestsLooted = stats["minecraft:open_chest"] || 0;
-                    const itemsInserted = stats["minecraft:items_inserted"] || 0;
-                    const mobKills = stats["minecraft:mob_kills"] || 0;
-                    const timesJumped = stats["minecraft:jump"] || 0;
-                    const deaths = stats["minecraft:deaths"] || 0;
-                    const timePlayed = stats["minecraft:play_one_minute"] || 0;
-                    
-                    totalChestsLooted += chestsLooted;
-                    totalItemsInserted += itemsInserted;
-                    totalMobKills += mobKills;
-                    totalTimesJumped += timesJumped;
-                    totalDeaths += deaths;
-                    totalTimePlayed += timePlayed;
-                    
-                    playerStats[player.playerName] = { chestsLooted, itemsInserted, mobKills, timesJumped, deaths, timePlayed };
+                    totalChestsLooted += stats["minecraft:open_chest"] || 0;
+                    totalItemsInserted += stats["minecraft:items_inserted"] || 0;
+                    totalMobKills += stats["minecraft:mob_kills"] || 0;
+                    totalTimesJumped += stats["minecraft:jump"] || 0;
+                    totalDeaths += stats["minecraft:deaths"] || 0;
+                    totalTimePlayed += stats["minecraft:play_one_minute"] || 0;
                 });
                 
                 document.getElementById('totalChestsLooted').textContent = totalChestsLooted;
@@ -145,7 +136,9 @@
                 document.getElementById('totalMobKills').textContent = totalMobKills;
                 document.getElementById('totalTimesJumped').textContent = totalTimesJumped;
                 document.getElementById('totalDeaths').textContent = totalDeaths;
-                document.getElementById('totalTimePlayed').textContent = totalTimePlayed;
+                document.getElementById('totalTimePlayed').textContent = Math.floor(totalTimePlayed / 20); // Convert ticks to minutes
+                
+                document.getElementById('summaryText').textContent = `The players have been busy! They have looted ${totalChestsLooted} chests, inserted ${totalItemsInserted} items into the ME network, and slain ${totalMobKills} mobs. They've jumped ${totalTimesJumped} times, died ${totalDeaths} times, and played for a total of ${Math.floor(totalTimePlayed / 20)} minutes!`;
             } catch (error) {
                 console.error('Error fetching stats:', error);
             }
