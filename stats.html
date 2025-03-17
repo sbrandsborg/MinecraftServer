@@ -35,7 +35,7 @@
             list-style-type: none;
         }
         .online {color: #4CAF50;}
-        .offline {color: #aaa;}
+        .offline {color: #ff4c4c;}
         .stats-table {
             width: 100%;
             text-align: center;
@@ -111,23 +111,6 @@
 
                 document.getElementById('onlinePlayers').innerHTML = onlinePlayers.map(p => `<li class="online">${p}</li>`).join('');
                 document.getElementById('offlinePlayers').innerHTML = offlinePlayers.map(p => `<li class="offline">${p}</li>`).join('');
-
-                let totalStats = { chestsLooted: 0, itemsInserted: 0, mobKills: 0, jumps: 0, deaths: 0, timePlayed: 0, blocksMined: 0 };
-
-                data.playerStats.forEach(player => {
-                    totalStats.chestsLooted += player.stats['minecraft:custom']['minecraft:open_chest'] || 0;
-                    totalStats.itemsInserted += player.stats['minecraft:custom']['minecraft:items_inserted'] || 0;
-                    totalStats.mobKills += player.stats['minecraft:custom']['minecraft:mob_kills'] || 0;
-                    totalStats.jumps += player.stats['minecraft:custom']['minecraft:jump'] || 0;
-                    totalStats.deaths += player.stats['minecraft:custom']['minecraft:deaths'] || 0;
-                    totalStats.timePlayed += Math.floor(player.stats['minecraft:custom']['minecraft:play_time'] / 1200);
-                    totalStats.blocksMined += Object.values(player.stats['minecraft:mined']).reduce((sum, val) => sum + val, 0);
-                });
-
-                document.getElementById('epicSaga').innerHTML = `🔥 Players have mined <strong>${totalStats.blocksMined}</strong> blocks, looted <strong>${totalStats.chestsLooted}</strong> chests, inserted <strong>${totalStats.itemsInserted}</strong> items, and slain <strong>${totalStats.mobKills}</strong> foes. They have jumped <strong>${totalStats.jumps}</strong> times, faced doom <strong>${totalStats.deaths}</strong> times, and spent <strong>${totalStats.timePlayed}</strong> minutes in this blocky world! 🚀`;
-
-                document.getElementById('summaryStats').innerHTML =
-                    `<td>${totalStats.chestsLooted}</td><td>${totalStats.itemsInserted}</td><td>${totalStats.mobKills}</td><td>${totalStats.jumps}</td><td>${totalStats.deaths}</td><td>${totalStats.timePlayed}</td><td>${totalStats.blocksMined}</td>`;
 
             } catch (error) {
                 console.error('Error:', error);
