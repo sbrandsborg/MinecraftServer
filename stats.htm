@@ -27,7 +27,7 @@
                 let playtimes = [];
 
                 data.forEach(player => {
-                    let playtimeTicks = player.Stats["stat.playOneMinute"] || 0;
+                    let playtimeTicks = player.Stats.stats["minecraft:custom"]["minecraft:play_time"] || 0;
                     let playtimeMinutes = playtimeTicks / 1200; // Omregning fra ticks til minutter
 
                     players.push(player.UUID);
