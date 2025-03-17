@@ -48,6 +48,11 @@
             margin-top: 20px;
             font-size: 18px;
         }
+        .highlight {
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: underline;
+        }
         a {
             color: #f1c40f;
             text-decoration: none;
@@ -64,11 +69,12 @@
         <p><a href="https://sbrandsborg.github.io/MinecraftServer/">🏠 Return to Main Page</a></p>
         
         <h2>🌍 Server Overview</h2>
-        <p>The server has been running for <strong><span id="days"></span></strong> days, and the in-game time is currently <strong><span id="time"></span></strong>. Right now, it's <span id="dayNight"></span>.</p>
+        <p>The world has been alive for <strong><span id="days"></span></strong> days. The sun rises and sets, and right now it's <span id="dayNight"></span>. The in-game clock shows <strong><span id="time"></span></strong> – time to adventure! ⛏️</p>
         
-        <h2>📊 Server Summary</h2>
+        <h2>📜 A Tale of the Server</h2>
         <p class="summary-text" id="summaryText"></p>
         
+        <h2>📊 Server Summary</h2>
         <table class="stats-summary">
             <tr>
                 <th>Chests Looted</th>
@@ -131,14 +137,7 @@
                     totalTimePlayed += stats["minecraft:play_one_minute"] || 0;
                 });
                 
-                document.getElementById('totalChestsLooted').textContent = totalChestsLooted;
-                document.getElementById('totalItemsInserted').textContent = totalItemsInserted;
-                document.getElementById('totalMobKills').textContent = totalMobKills;
-                document.getElementById('totalTimesJumped').textContent = totalTimesJumped;
-                document.getElementById('totalDeaths').textContent = totalDeaths;
-                document.getElementById('totalTimePlayed').textContent = Math.floor(totalTimePlayed / 20); // Convert ticks to minutes
-                
-                document.getElementById('summaryText').textContent = `The players have been busy! They have looted ${totalChestsLooted} chests, inserted ${totalItemsInserted} items into the ME network, and slain ${totalMobKills} mobs. They've jumped ${totalTimesJumped} times, died ${totalDeaths} times, and played for a total of ${Math.floor(totalTimePlayed / 20)} minutes!`;
+                document.getElementById('summaryText').innerHTML = `Once upon a time, in a land of blocks, brave adventurers looted <span class='highlight' title='Chests Looted'>${totalChestsLooted}</span> chests, stored <span class='highlight' title='Items Inserted (ME Network)'>${totalItemsInserted}</span> items in the great ME vault, and defeated <span class='highlight' title='Mob Kills'>${totalMobKills}</span> foes. They leaped <span class='highlight' title='Times Jumped'>${totalTimesJumped}</span> times in joy (or fear), met their fate <span class='highlight' title='Deaths'>${totalDeaths}</span> times, and spent <span class='highlight' title='Time Played (Minutes)'>${Math.floor(totalTimePlayed / 20)}</span> minutes shaping the world!`;
             } catch (error) {
                 console.error('Error fetching stats:', error);
             }
