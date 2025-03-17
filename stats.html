@@ -133,19 +133,7 @@
                 const response = await fetch('Get-MCStats.json');
                 const data = await response.json();
                 
-                document.getElementById('time').textContent = data.currentInGameTime || "00:00";
-                document.getElementById('days').textContent = data.inGameDays || "0";
-                document.getElementById('dayNight').textContent = data.currentInGameTime && parseInt(data.currentInGameTime.split(':')[0]) >= 6 && parseInt(data.currentInGameTime.split(':')[0]) < 18 ? "☀️ Daytime in the Overworld" : "🌙 Nighttime in the Overworld";
-                
-                document.getElementById('totalChestsLooted').textContent = data.totalChestsLooted || "0";
-                document.getElementById('totalItemsInserted').textContent = data.totalItemsInserted || "0";
-                document.getElementById('totalMobKills').textContent = data.totalMobKills || "0";
-                document.getElementById('totalTimesJumped').textContent = data.totalTimesJumped || "0";
-                document.getElementById('totalDeaths').textContent = data.totalDeaths || "0";
-                document.getElementById('totalTimePlayed').textContent = data.totalTimePlayed ? Math.floor(data.totalTimePlayed / 20) : "0";
-                document.getElementById('totalBlocksMined').textContent = data.totalBlocksMined || "0";
-                
-                document.getElementById('summaryText').textContent = "🔥 The legend grows! Players have mined " + data.totalBlocksMined + " blocks, looted " + data.totalChestsLooted + " chests, stored " + data.totalItemsInserted + " treasures, and slain " + data.totalMobKills + " mighty foes!";
+                document.getElementById('summaryText').innerHTML = `🔥 The legend grows! Players have mined <span class='highlight'>${data.totalBlocksMined || 0}</span> blocks, looted <span class='highlight'>${data.totalChestsLooted || 0}</span> chests, stored <span class='highlight'>${data.totalItemsInserted || 0}</span> treasures, and slain <span class='highlight'>${data.totalMobKills || 0}</span> mighty foes. They have jumped <span class='highlight'>${data.totalTimesJumped || 0}</span> times, faced doom <span class='highlight'>${data.totalDeaths || 0}</span> times, and spent <span class='highlight'>${Math.floor(data.totalTimePlayed / 20) || 0}</span> minutes shaping this blocky world! 🏰🚀`;
             } catch (error) {
                 console.error('Error fetching stats:', error);
             }
