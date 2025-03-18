@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>SBrandsborg Minecraft ATM 10 Server - Test Statistics</title>
+  <title>SBrandsborg Minecraft ATM 10 Server - Statistics</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -52,6 +52,18 @@
     .offline {
       color: red;
     }
+    .story {
+      margin-top: 20px;
+      font-style: italic;
+      background-color: #292c36;
+      padding: 15px;
+      border-radius: 10px;
+    }
+    .story span {
+      font-weight: bold;
+      cursor: help;
+      color: #ffcc00;
+    }
   </style>
 </head>
 <body>
@@ -81,6 +93,10 @@
           <td colspan="7">Loading stats...</td>
         </tr>
       </table>
+
+      <!-- FUN MINECRAFT STORY -->
+      <h2>📖 The Tale of SBrandsborg</h2>
+      <p id="story" class="story">Crafting a new adventure...</p>
     </div>
 
     <!-- SIDEBAR -->
@@ -148,6 +164,27 @@
           </tr>
         `;
 
+        // GENERATE FUN MINECRAFT STORY
+        const storyElem = document.getElementById('story');
+        storyElem.innerHTML = `
+          In the mystical lands of SBrandsborg, heroes have looted
+          <span title="Chests Looted">${totalChestsLooted}</span> chests, uncovering legendary treasures. 🏆
+          They've placed <span title="Items Inserted">${totalItemsInserted}</span> sacred items into the ME network, 
+          ensuring the survival of their kingdom. 🏰
+
+          Fierce battles have been fought, with ${totalMobKills} mobs defeated. ⚔️  
+          But danger lurks, and our brave adventurers have met their fate 
+          <span title="Deaths">${totalDeaths}</span> times... 💀  
+
+          Through leaps and bounds, they've jumped 
+          <span title="Times Jumped">${totalTimesJumped}</span> times, crossing mountains and oceans. 🌍  
+
+          Time passes swiftly—our adventurers have spent 
+          <span title="Time Played">${Math.round(totalTimePlayed / 60)}</span> hours shaping the world.  
+          And with unbreakable will, they have mined 
+          <span title="Blocks Mined">${totalBlocksMined}</span> blocks, carving their legacy into the land! ⛏️
+        `;
+
         // ONLINE/OFFLINE PLAYERS
         const onlinePlayersEl = document.getElementById('onlinePlayers');
         const offlinePlayersEl = document.getElementById('offlinePlayers');
@@ -164,7 +201,6 @@
       }
     }
 
-    // Initial load + update every 15 minutes
     fetchStats();
     setInterval(fetchStats, 900000);
   </script>
