@@ -84,11 +84,8 @@
   <script>
     async function fetchStats() {
       try {
-        console.log("Fetching stats...");
         const response = await fetch('./Get-MCStats.json'); 
         const data = await response.json();
-
-        console.log("Data received:", data); 
 
         // SERVER OVERVIEW
         const hour = parseInt(data.currentInGameTime.split(':')[0], 10);
@@ -115,6 +112,9 @@
           totalBlocksMined += Object.values(player.stats["minecraft:mined"] || {}).reduce((a, b) => a + b, 0);
         });
 
+        // KONVERTER MINUTTER TIL TIMER
+        const totalHoursPlayed = Math.floor(totalTimePlayed / 60);
+
         // GENERATE FUN MINECRAFT STORY
         const storyElem = document.getElementById('story');
         storyElem.innerHTML = `
@@ -129,7 +129,7 @@
 
           We have jumped <span title="Times Jumped">${totalTimesJumped}</span> times, scaling mountains and crossing rivers. 🌊  
           Through tireless effort, we have dedicated 
-          <span title="Time Played">${Math.round(totalTimePlayed / 60)}</span> hours to crafting our world.  
+          <span title="Time Played">${totalHoursPlayed}</span> hours to crafting our world.  
           And with each strike of the pickaxe, we have carved 
           <span title="Blocks Mined">${totalBlocksMined}</span> blocks from the earth, forging our legacy. ⛏️
         `;
@@ -138,16 +138,16 @@
         const onlinePlayersEl = document.getElementById('onlinePlayers');
         const offlinePlayersEl = document.getElementById('offlinePlayers');
 
-        // Check if data.onlinePlayers exists and is an array
+        // Sørg for at data.onlinePlayers eksisterer og er en liste
         const onlinePlayers = Array.isArray(data.onlinePlayers) ? data.onlinePlayers : [];
         const allPlayers = data.playerStats.map(p => p.playerName);
         const offlinePlayers = allPlayers.filter(name => !onlinePlayers.includes(name));
 
-        onlinePlayersEl.innerHTML = onlinePlayers.length
+        onlinePlayersEl.innerHTML = onlinePlayers.length > 0
           ? onlinePlayers.map(name => `<li class="online">${name}</li>`).join('')
           : '<li class="offline">No one is online</li>';
 
-        offlinePlayersEl.innerHTML = offlinePlayers.length
+        offlinePlayersEl.innerHTML = offlinePlayers.length > 0
           ? offlinePlayers.map(name => `<li class="offline">${name}</li>`).join('')
           : '<li class="online">Everyone is online!</li>';
 
