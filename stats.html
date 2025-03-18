@@ -1,119 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>SBrandsborg Minecraft ATM 10 Server - Statistics</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #2a2d35;
-            color: #ffffff;
-            padding: 15px;
-            line-height: 1.6;
-        }
-        .container {
-            display: flex;
-            gap: 15px;
-        }
-        .main-content {
-            flex: 3;
-            background-color: #3a3d47;
-            padding: 20px;
-            border-radius: 10px;
-        }
-        .sidebar {
-            flex: 1;
-            background-color: #25282e;
-            padding: 20px;
-            border-radius: 10px;
-        }
-        h1, h2 {
-            margin-bottom: 10px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-        th, td {
-            padding: 8px;
-            border: 1px solid #555;
-            text-align: center;
-        }
-        .online { color: #4CAF50; }
-        .offline { color: #F44336; }
-        .story span {
-            font-weight: bold;
-            cursor: help;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>SBrandsborg Minecraft ATM 10 Server - Statistics</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #2a2d35;
+      color: #ffffff;
+      padding: 15px;
+      line-height: 1.6;
+      margin: 0;
+    }
+    .container {
+      display: flex;
+      gap: 15px;
+    }
+    .main-content {
+      flex: 3;
+      background-color: #3a3d47;
+      padding: 20px;
+      border-radius: 10px;
+    }
+    .sidebar {
+      flex: 1;
+      background-color: #25282e;
+      padding: 20px;
+      border-radius: 10px;
+      height: fit-content;
+    }
+    h1, h2 {
+      margin-bottom: 10px;
+      margin-top: 0;
+    }
+    p {
+      margin-top: 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      padding: 8px;
+      border: 1px solid #555;
+      text-align: center;
+    }
+    .story {
+      margin-bottom: 10px;
+    }
+    .story span {
+      font-weight: bold;
+      cursor: help;
+    }
+    .online {
+      color: lime;
+    }
+    .offline {
+      color: red;
+    }
+  </style>
 </head>
 <body>
-
-<div class="container">
+  <div class="container">
+    <!-- MAIN CONTENT -->
     <div class="main-content">
-        <h1>SBrandsborg Minecraft ATM 10 Server - Statistics</h1>
-        <p>🔄 Updated every 15 minutes</p>
+      <h1>SBrandsborg Minecraft ATM 10 Server - Statistics</h1>
+      <p>🔄 Updated every 15 minutes</p>
 
-        <h2>🌎 Server Overview</h2>
-        <p id="serverOverview">Loading...</p>
+      <!-- SERVER OVERVIEW -->
+      <h2>🌎 Server Overview</h2>
+      <p id="serverOverview">Loading overview...</p>
 
-        <h2>📜 The Epic Saga Continues...</h2>
-        <p class="story" id="epicSaga">Gathering legends...</p>
+      <!-- EPIC SAGA -->
+      <h2>📜 The Epic Saga Continues...</h2>
+      <p class="story" id="epicSaga">Gathering legends...</p>
 
-        <h2>📊 Server Summary</h2>
-        <table id="serverSummary">
-            <tr>
-                <th>Chests Looted</th>
-                <th>Items Inserted (ME Network)</th>
-                <th>Mob Kills</th>
-                <th>Times Jumped</th>
-                <th>Deaths</th>
-                <th>Time Played (Minutes)</th>
-                <th>Blocks Mined</th>
-            </tr>
-            <tr>
-                <td colspan="7">Loading stats...</td>
-            </tr>
-        </table>
+      <!-- SERVER SUMMARY -->
+      <h2>📊 Server Summary</h2>
+      <table id="serverSummary">
+        <tr>
+          <th>Chests Looted</th>
+          <th>Items Inserted (ME Network)</th>
+          <th>Mob Kills</th>
+          <th>Times Jumped</th>
+          <th>Deaths</th>
+          <th>Time Played (Minutes)</th>
+          <th>Blocks Mined</th>
+        </tr>
+        <tr>
+          <td colspan="7">Loading stats...</td>
+        </tr>
+      </table>
     </div>
 
+    <!-- SIDEBAR -->
     <div class="sidebar">
-        <h2>Online Players</h2>
-        <ul id="onlinePlayers"></ul>
-        <h2>Offline Players</h2>
-        <ul id="offlinePlayers"></ul>
+      <h2>Online Players</h2>
+      <ul id="onlinePlayers"></ul>
+      <h2>Offline Players</h2>
+      <ul id="offlinePlayers"></ul>
     </div>
-</div>
+  </div>
 
-<script>
-async function fetchStats() {
-    try {
+  <script>
+    async function fetchStats() {
+      try {
         const response = await fetch('Get-MCStats.json');
         const data = await response.json();
 
-        // Server Overview
-        const overview = document.getElementById('serverOverview');
-        overview.innerHTML = `For <strong>${data.inGameDays}</strong> in-game days, adventurers have roamed the land.
-        The sun rises, mobs lurk at night, and right now, it's 
-        ${parseInt(data.currentInGameTime.split(':')[0]) >= 6 && parseInt(data.currentInGameTime.split(':')[0]) < 18 ? '☀️ Daytime' : '🌙 Nighttime'}
-        in the Overworld. The in-game clock strikes <strong>${data.currentInGameTime}</strong> – another day of adventure begins!`;
+        // 1. SERVER OVERVIEW
+        //   Shows day count, day/night, current time
+        const hour = parseInt(data.currentInGameTime.split(':')[0], 10);
+        const isDaytime = (hour >= 6 && hour < 18);
+        document.getElementById('serverOverview').innerHTML = `
+          For <strong>${data.inGameDays}</strong> in-game days,
+          adventurers have roamed the land. The sun rises, mobs lurk at night,
+          and right now, it's ${isDaytime ? '🌞 Daytime' : '🌙 Nighttime'} in the Overworld.
+          The in-game clock strikes <strong>${data.currentInGameTime}</strong> –
+          another day of adventure begins!
+        `;
 
-        // Epic Saga (with hover explanations)
-        document.getElementById('epicSaga').innerHTML = `
-        In a world carved by courage and determination, players have mined
-        <span title="Blocks Mined">${data.totalStats.blocksMined}</span> blocks,
-        looted <span title="Chests Looted">${data.totalStats.chestsLooted}</span> chests,
-        inserted <span title="Items Inserted (ME Network)">${data.totalStats.itemsInserted_ME}</span> items,
-        and slain <span title="Mob Kills">${data.totalStats.mobKills}</span> foes.
-        They've jumped <span title="Times Jumped">${data.totalStats.timesJumped}</span> times,
-        faced doom <span title="Deaths">${data.totalStats.deaths}</span> times,
-        and spent <span title="Time Played (Minutes)">${data.totalStats.timePlayedMinutes}</span> minutes shaping this blocky world!
-        Their journey is far from over... 🚀`;
+        // 2. EPIC SAGA
+        //   Displays big story with hover text for each stat
+        const sagaElem = document.getElementById('epicSaga');
+        sagaElem.innerHTML = `
+          In a world carved by courage and determination, players have mined
+          <span title="Blocks Mined">${data.totalStats.blocksMined}</span> blocks,
+          looted <span title="Chests Looted">${data.totalStats.chestsLooted}</span> chests,
+          inserted <span title="Items Inserted (ME Network)">${data.totalStats.itemsInserted_ME}</span> items,
+          and slain <span title="Mob Kills">${data.totalStats.mobKills}</span> foes.
+          They've jumped <span title="Times Jumped">${data.totalStats.timesJumped}</span> times,
+          faced doom <span title="Deaths">${data.totalStats.deaths}</span> times,
+          and spent <span title="Time Played (Minutes)">${data.totalStats.timePlayedMinutes}</span> minutes
+          shaping this blocky world! Their journey is far from over... 🚀
+        `;
 
-        // Server Summary
-        document.getElementById('serverSummary').innerHTML = `
-        <tr>
+        // 3. SERVER SUMMARY TABLE
+        //   Fills each cell with the appropriate number
+        const summaryTable = document.getElementById('serverSummary');
+        summaryTable.innerHTML = `
+          <tr>
             <th>Chests Looted</th>
             <th>Items Inserted (ME Network)</th>
             <th>Mob Kills</th>
@@ -121,8 +148,8 @@ async function fetchStats() {
             <th>Deaths</th>
             <th>Time Played (Minutes)</th>
             <th>Blocks Mined</th>
-        </tr>
-        <tr>
+          </tr>
+          <tr>
             <td>${data.totalStats.chestsLooted}</td>
             <td>${data.totalStats.itemsInserted_ME}</td>
             <td>${data.totalStats.mobKills}</td>
@@ -130,25 +157,32 @@ async function fetchStats() {
             <td>${data.totalStats.deaths}</td>
             <td>${data.totalStats.timePlayedMinutes}</td>
             <td>${data.totalStats.blocksMined}</td>
-        </tr>`;
+          </tr>
+        `;
 
-        // Online/Offline Players
-        const onlineList = document.getElementById('onlinePlayers');
-        const offlineList = document.getElementById('offlinePlayers');
-        const allPlayers = data.playerStats.map(player => player.playerName);
-        const offlinePlayers = allPlayers.filter(player => !data.onlinePlayers.includes(player));
+        // 4. ONLINE/OFFLINE PLAYERS
+        //   Color-coded lists
+        const onlinePlayersEl = document.getElementById('onlinePlayers');
+        const offlinePlayersEl = document.getElementById('offlinePlayers');
 
-        onlineList.innerHTML = data.onlinePlayers.map(p => `<li class="online">${p}</li>`).join('');
-        offlineList.innerHTML = offlinePlayers.map(p => `<li class="offline">${p}</li>`).join('');
+        const allPlayers = data.playerStats.map(p => p.playerName);
+        const offlinePlayers = allPlayers.filter(name => !data.onlinePlayers.includes(name));
 
-    } catch (error) {
-        console.error('Error fetching stats:', error);
+        onlinePlayersEl.innerHTML = data.onlinePlayers
+          .map(name => `<li class="online">${name}</li>`).join('');
+
+        offlinePlayersEl.innerHTML = offlinePlayers
+          .map(name => `<li class="offline">${name}</li>`).join('');
+
+      } catch (error) {
+        console.error('Error loading stats:', error);
+        // If there's an error, you can display a message or keep "Loading..." text
+      }
     }
-}
 
-fetchStats();
-setInterval(fetchStats, 900000);
-</script>
-
+    // Initial load + update every 15 minutes
+    fetchStats();
+    setInterval(fetchStats, 900000);
+  </script>
 </body>
 </html>
