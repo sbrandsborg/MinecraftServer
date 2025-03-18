@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>SBrandsborg Minecraft ATM 10 Server - Statistics</title>
+  <title>Minecraft ATM 10 Server - The Grand Adventure</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -36,16 +36,6 @@
     p {
       margin-top: 0;
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-    th, td {
-      padding: 8px;
-      border: 1px solid #555;
-      text-align: center;
-    }
     .online {
       color: lime;
     }
@@ -70,41 +60,24 @@
   <div class="container">
     <!-- MAIN CONTENT -->
     <div class="main-content">
-      <h1>SBrandsborg Minecraft ATM 10 Server - Statistics</h1>
+      <h1>Minecraft ATM 10 Server - The Grand Adventure</h1>
       <p>🔄 Updated every 15 minutes</p>
 
       <!-- SERVER OVERVIEW -->
-      <h2>🌎 Server Overview</h2>
+      <h2>🌎 The World So Far</h2>
       <p id="serverOverview">Loading overview...</p>
 
-      <!-- SERVER SUMMARY -->
-      <h2>📊 Server Summary</h2>
-      <table id="serverSummary">
-        <tr>
-          <th>Chests Looted</th>
-          <th>Items Inserted (ME Network)</th>
-          <th>Mob Kills</th>
-          <th>Times Jumped</th>
-          <th>Deaths</th>
-          <th>Time Played (Minutes)</th>
-          <th>Blocks Mined</th>
-        </tr>
-        <tr>
-          <td colspan="7">Loading stats...</td>
-        </tr>
-      </table>
-
-      <!-- FUN MINECRAFT STORY -->
-      <h2>📖 The Tale of SBrandsborg</h2>
+      <!-- EPIC MINECRAFT STORY -->
+      <h2>📖 The Story of Our Journey</h2>
       <p id="story" class="story">Crafting a new adventure...</p>
     </div>
 
     <!-- SIDEBAR -->
     <div class="sidebar">
       <h2>Online Players</h2>
-      <ul id="onlinePlayers"></ul>
+      <ul id="onlinePlayers">Loading...</ul>
       <h2>Offline Players</h2>
-      <ul id="offlinePlayers"></ul>
+      <ul id="offlinePlayers">Loading...</ul>
     </div>
   </div>
 
@@ -112,10 +85,10 @@
     async function fetchStats() {
       try {
         console.log("Fetching stats...");
-        const response = await fetch('./Get-MCStats.json'); // Ensure correct path
+        const response = await fetch('./Get-MCStats.json'); 
         const data = await response.json();
 
-        console.log("Data received:", data); // Debugging
+        console.log("Data received:", data); 
 
         // SERVER OVERVIEW
         const hour = parseInt(data.currentInGameTime.split(':')[0], 10);
@@ -142,58 +115,41 @@
           totalBlocksMined += Object.values(player.stats["minecraft:mined"] || {}).reduce((a, b) => a + b, 0);
         });
 
-        // UPDATE SERVER SUMMARY TABLE
-        document.getElementById('serverSummary').innerHTML = `
-          <tr>
-            <th>Chests Looted</th>
-            <th>Items Inserted (ME Network)</th>
-            <th>Mob Kills</th>
-            <th>Times Jumped</th>
-            <th>Deaths</th>
-            <th>Time Played (Minutes)</th>
-            <th>Blocks Mined</th>
-          </tr>
-          <tr>
-            <td>${totalChestsLooted}</td>
-            <td>${totalItemsInserted}</td>
-            <td>${totalMobKills}</td>
-            <td>${totalTimesJumped}</td>
-            <td>${totalDeaths}</td>
-            <td>${Math.round(totalTimePlayed / 60)}</td>
-            <td>${totalBlocksMined}</td>
-          </tr>
-        `;
-
         // GENERATE FUN MINECRAFT STORY
         const storyElem = document.getElementById('story');
         storyElem.innerHTML = `
-          In the mystical lands of SBrandsborg, heroes have looted
-          <span title="Chests Looted">${totalChestsLooted}</span> chests, uncovering legendary treasures. 🏆
-          They've placed <span title="Items Inserted">${totalItemsInserted}</span> sacred items into the ME network, 
-          ensuring the survival of their kingdom. 🏰
+          In this vast land, we have looted
+          <span title="Chests Looted">${totalChestsLooted}</span> treasure chests, unlocking secrets of the past. 🏆  
+          Our ME network now holds <span title="Items Inserted">${totalItemsInserted}</span> powerful artifacts, ensuring our survival. ⚒️  
 
-          Fierce battles have been fought, with ${totalMobKills} mobs defeated. ⚔️  
-          But danger lurks, and our brave adventurers have met their fate 
+          The monsters of the night have fallen before us—
+          we have vanquished <span title="Mob Kills">${totalMobKills}</span> foes in fierce combat. ⚔️  
+          But not all stories end in triumph; our heroes have met their fate 
           <span title="Deaths">${totalDeaths}</span> times... 💀  
 
-          Through leaps and bounds, they've jumped 
-          <span title="Times Jumped">${totalTimesJumped}</span> times, crossing mountains and oceans. 🌍  
-
-          Time passes swiftly—our adventurers have spent 
-          <span title="Time Played">${Math.round(totalTimePlayed / 60)}</span> hours shaping the world.  
-          And with unbreakable will, they have mined 
-          <span title="Blocks Mined">${totalBlocksMined}</span> blocks, carving their legacy into the land! ⛏️
+          We have jumped <span title="Times Jumped">${totalTimesJumped}</span> times, scaling mountains and crossing rivers. 🌊  
+          Through tireless effort, we have dedicated 
+          <span title="Time Played">${Math.round(totalTimePlayed / 60)}</span> hours to crafting our world.  
+          And with each strike of the pickaxe, we have carved 
+          <span title="Blocks Mined">${totalBlocksMined}</span> blocks from the earth, forging our legacy. ⛏️
         `;
 
-        // ONLINE/OFFLINE PLAYERS
+        // ONLINE/OFFLINE PLAYERS FIX
         const onlinePlayersEl = document.getElementById('onlinePlayers');
         const offlinePlayersEl = document.getElementById('offlinePlayers');
 
+        // Check if data.onlinePlayers exists and is an array
+        const onlinePlayers = Array.isArray(data.onlinePlayers) ? data.onlinePlayers : [];
         const allPlayers = data.playerStats.map(p => p.playerName);
-        const offlinePlayers = allPlayers.filter(name => !data.onlinePlayers.includes(name));
+        const offlinePlayers = allPlayers.filter(name => !onlinePlayers.includes(name));
 
-        onlinePlayersEl.innerHTML = data.onlinePlayers.map(name => `<li class="online">${name}</li>`).join('');
-        offlinePlayersEl.innerHTML = offlinePlayers.map(name => `<li class="offline">${name}</li>`).join('');
+        onlinePlayersEl.innerHTML = onlinePlayers.length
+          ? onlinePlayers.map(name => `<li class="online">${name}</li>`).join('')
+          : '<li class="offline">No one is online</li>';
+
+        offlinePlayersEl.innerHTML = offlinePlayers.length
+          ? offlinePlayers.map(name => `<li class="offline">${name}</li>`).join('')
+          : '<li class="online">Everyone is online!</li>';
 
       } catch (error) {
         console.error('Error loading stats:', error);
