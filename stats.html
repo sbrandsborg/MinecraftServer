@@ -46,13 +46,6 @@
       border: 1px solid #555;
       text-align: center;
     }
-    .story {
-      margin-bottom: 10px;
-    }
-    .story span {
-      font-weight: bold;
-      cursor: help;
-    }
     .online {
       color: lime;
     }
@@ -71,10 +64,6 @@
       <!-- SERVER OVERVIEW -->
       <h2>🌎 Server Overview</h2>
       <p id="serverOverview">Loading overview...</p>
-
-      <!-- EPIC SAGA -->
-      <h2>📜 The Epic Saga Continues...</h2>
-      <p class="story" id="epicSaga">Gathering legends...</p>
 
       <!-- SERVER SUMMARY -->
       <h2>📊 Server Summary</h2>
@@ -106,40 +95,39 @@
   <script>
     async function fetchStats() {
       try {
-        const response = await fetch('Get-MCStats.json');
+        console.log("Fetching stats...");
+        const response = await fetch('./Get-MCStats.json'); // Ensure correct path
         const data = await response.json();
 
-        // 1. SERVER OVERVIEW
-        //   Shows day count, day/night, current time
+        console.log("Data received:", data); // Debugging
+
+        // SERVER OVERVIEW
         const hour = parseInt(data.currentInGameTime.split(':')[0], 10);
         const isDaytime = (hour >= 6 && hour < 18);
         document.getElementById('serverOverview').innerHTML = `
           For <strong>${data.inGameDays}</strong> in-game days,
           adventurers have roamed the land. The sun rises, mobs lurk at night,
           and right now, it's ${isDaytime ? '🌞 Daytime' : '🌙 Nighttime'} in the Overworld.
-          The in-game clock strikes <strong>${data.currentInGameTime}</strong> –
-          another day of adventure begins!
+          The in-game clock strikes <strong>${data.currentInGameTime}</strong> – another day of adventure begins!
         `;
 
-        // 2. EPIC SAGA
-        //   Displays big story with hover text for each stat
-        const sagaElem = document.getElementById('epicSaga');
-        sagaElem.innerHTML = `
-          In a world carved by courage and determination, players have mined
-          <span title="Blocks Mined">${data.totalStats.blocksMined}</span> blocks,
-          looted <span title="Chests Looted">${data.totalStats.chestsLooted}</span> chests,
-          inserted <span title="Items Inserted (ME Network)">${data.totalStats.itemsInserted_ME}</span> items,
-          and slain <span title="Mob Kills">${data.totalStats.mobKills}</span> foes.
-          They've jumped <span title="Times Jumped">${data.totalStats.timesJumped}</span> times,
-          faced doom <span title="Deaths">${data.totalStats.deaths}</span> times,
-          and spent <span title="Time Played (Minutes)">${data.totalStats.timePlayedMinutes}</span> minutes
-          shaping this blocky world! Their journey is far from over... 🚀
-        `;
+        // ACCUMULATE STATS
+        let totalChestsLooted = 0, totalItemsInserted = 0, totalMobKills = 0;
+        let totalTimesJumped = 0, totalDeaths = 0, totalTimePlayed = 0, totalBlocksMined = 0;
 
-        // 3. SERVER SUMMARY TABLE
-        //   Fills each cell with the appropriate number
-        const summaryTable = document.getElementById('serverSummary');
-        summaryTable.innerHTML = `
+        data.playerStats.forEach(player => {
+          const stats = player.stats["minecraft:custom"] || {};
+          totalChestsLooted += stats["minecraft:open_chest"] || 0;
+          totalItemsInserted += stats["minecraft:items_inserted"] || 0;
+          totalMobKills += stats["minecraft:mob_kills"] || 0;
+          totalTimesJumped += stats["minecraft:jump"] || 0;
+          totalDeaths += stats["minecraft:deaths"] || 0;
+          totalTimePlayed += stats["minecraft:play_time"] || 0;
+          totalBlocksMined += Object.values(player.stats["minecraft:mined"] || {}).reduce((a, b) => a + b, 0);
+        });
+
+        // UPDATE SERVER SUMMARY TABLE
+        document.getElementById('serverSummary').innerHTML = `
           <tr>
             <th>Chests Looted</th>
             <th>Items Inserted (ME Network)</th>
@@ -150,33 +138,29 @@
             <th>Blocks Mined</th>
           </tr>
           <tr>
-            <td>${data.totalStats.chestsLooted}</td>
-            <td>${data.totalStats.itemsInserted_ME}</td>
-            <td>${data.totalStats.mobKills}</td>
-            <td>${data.totalStats.timesJumped}</td>
-            <td>${data.totalStats.deaths}</td>
-            <td>${data.totalStats.timePlayedMinutes}</td>
-            <td>${data.totalStats.blocksMined}</td>
+            <td>${totalChestsLooted}</td>
+            <td>${totalItemsInserted}</td>
+            <td>${totalMobKills}</td>
+            <td>${totalTimesJumped}</td>
+            <td>${totalDeaths}</td>
+            <td>${Math.round(totalTimePlayed / 60)}</td>
+            <td>${totalBlocksMined}</td>
           </tr>
         `;
 
-        // 4. ONLINE/OFFLINE PLAYERS
-        //   Color-coded lists
+        // ONLINE/OFFLINE PLAYERS
         const onlinePlayersEl = document.getElementById('onlinePlayers');
         const offlinePlayersEl = document.getElementById('offlinePlayers');
 
         const allPlayers = data.playerStats.map(p => p.playerName);
         const offlinePlayers = allPlayers.filter(name => !data.onlinePlayers.includes(name));
 
-        onlinePlayersEl.innerHTML = data.onlinePlayers
-          .map(name => `<li class="online">${name}</li>`).join('');
-
-        offlinePlayersEl.innerHTML = offlinePlayers
-          .map(name => `<li class="offline">${name}</li>`).join('');
+        onlinePlayersEl.innerHTML = data.onlinePlayers.map(name => `<li class="online">${name}</li>`).join('');
+        offlinePlayersEl.innerHTML = offlinePlayers.map(name => `<li class="offline">${name}</li>`).join('');
 
       } catch (error) {
         console.error('Error loading stats:', error);
-        // If there's an error, you can display a message or keep "Loading..." text
+        document.getElementById('serverOverview').innerText = 'Failed to load server stats.';
       }
     }
 
