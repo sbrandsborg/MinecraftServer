@@ -6,119 +6,149 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #2b2d31;
-            color: #fff;
-            padding: 20px;
-            margin: 0;
+            background-color: #2a2d35;
+            color: #ffffff;
+            padding: 15px;
+            line-height: 1.6;
         }
         .container {
             display: flex;
+            gap: 15px;
         }
-        .content {
-            width: 75%;
-            margin-right: 10px;
-            background-color: #383b40;
+        .main-content {
+            flex: 3;
+            background-color: #3a3d47;
             padding: 20px;
             border-radius: 10px;
         }
         .sidebar {
-            width: 25%;
-            background-color: #202225;
-            padding: 15px;
+            flex: 1;
+            background-color: #25282e;
+            padding: 20px;
             border-radius: 10px;
         }
-        h1, h2, h3 {
-            margin: 10px 0;
+        h1, h2 {
+            margin-bottom: 10px;
         }
-        ul {
-            padding-left: 20px;
-            list-style-type: none;
-        }
-        .online {color: #4CAF50;}
-        .offline {color: #ff4c4c;}
-        .stats-table {
+        table {
             width: 100%;
-            text-align: center;
             border-collapse: collapse;
-            margin-top: 15px;
+            margin-top: 10px;
         }
-        .stats-table th, .stats-table td {
-            border: 1px solid #555;
+        th, td {
             padding: 8px;
+            border: 1px solid #555;
+            text-align: center;
+        }
+        .online { color: #4CAF50; }
+        .offline { color: #F44336; }
+        .story span {
+            font-weight: bold;
+            cursor: help;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="content">
-            <h1>SBrandsborg Minecraft ATM 10 Server - Statistics</h1>
-            <p>🔄 Updated every 15 minutes</p>
-            <div>
-                <h2>🌍 Server Overview</h2>
-                <p id="serverOverview">Loading data...</p>
 
-                <h2>📜 The Epic Saga Continues...</h2>
-                <p id="epicSaga">In a world carved by courage and determination, players continue to push the boundaries, unearthing treasures, conquering foes, and etching their stories into the land. Each block mined and each chest looted marks another step toward legendary status. Their journey is far from over, and many adventures still await...</p>
+<div class="container">
+    <div class="main-content">
+        <h1>SBrandsborg Minecraft ATM 10 Server - Statistics</h1>
+        <p>🔄 Updated every 15 minutes</p>
 
-                <h2>📊 Server Summary</h2>
-                <table class="stats-table">
-                    <thead>
-                        <tr>
-                            <th>Chests Looted</th>
-                            <th>Items Inserted (ME Network)</th>
-                            <th>Mob Kills</th>
-                            <th>Times Jumped</th>
-                            <th>Deaths</th>
-                            <th>Time Played (Minutes)</th>
-                            <th>Blocks Mined</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr id="summaryStats">
-                            <td colspan="7">Loading stats...</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="sidebar">
-            <h3>Online Players</h3>
-            <ul id="onlinePlayers"></ul>
+        <h2>🌎 Server Overview</h2>
+        <p id="serverOverview">Loading...</p>
 
-            <h3>Offline Players</h3>
-            <ul id="offlinePlayers"></ul>
-        </div>
+        <h2>📜 The Epic Saga Continues...</h2>
+        <p class="story" id="epicSaga">Gathering legends...</p>
+
+        <h2>📊 Server Summary</h2>
+        <table id="serverSummary">
+            <tr>
+                <th>Chests Looted</th>
+                <th>Items Inserted (ME Network)</th>
+                <th>Mob Kills</th>
+                <th>Times Jumped</th>
+                <th>Deaths</th>
+                <th>Time Played (Minutes)</th>
+                <th>Blocks Mined</th>
+            </tr>
+            <tr>
+                <td colspan="7">Loading stats...</td>
+            </tr>
+        </table>
     </div>
 
-    <script>
-        async function fetchStats() {
-            try {
-                const response = await fetch('Get-MCStats.json');
-                const data = await response.json();
+    <div class="sidebar">
+        <h2>Online Players</h2>
+        <ul id="onlinePlayers"></ul>
+        <h2>Offline Players</h2>
+        <ul id="offlinePlayers"></ul>
+    </div>
+</div>
 
-                const time = data.currentInGameTime;
-                const days = data.inGameDays;
+<script>
+async function fetchStats() {
+    try {
+        const response = await fetch('Get-MCStats.json');
+        const data = await response.json();
 
-                document.getElementById('serverOverview').innerHTML =
-                    `For <strong>${days}</strong> in-game days, adventurers have roamed the land. 
-                    The sun rises, mobs lurk at night, and right now, it's 
-                    ${(parseInt(time.split(':')[0]) >= 6 && parseInt(time.split(':')[0]) < 18) ? '☀️ Daytime' : '🌙 Nighttime'} in the Overworld. 
-                    The in-game clock strikes <strong>${time}</strong> – another day of adventure begins!`;
+        // Server Overview
+        const overview = document.getElementById('serverOverview');
+        overview.innerHTML = `For <strong>${data.inGameDays}</strong> in-game days, adventurers have roamed the land.
+        The sun rises, mobs lurk at night, and right now, it's 
+        ${parseInt(data.currentInGameTime.split(':')[0]) >= 6 && parseInt(data.currentInGameTime.split(':')[0]) < 18 ? '☀️ Daytime' : '🌙 Nighttime'}
+        in the Overworld. The in-game clock strikes <strong>${data.currentInGameTime}</strong> – another day of adventure begins!`;
 
-                const onlinePlayers = data.onlinePlayers;
-                const allPlayers = data.playerStats.map(p => p.playerName);
-                const offlinePlayers = allPlayers.filter(p => !onlinePlayers.includes(p));
+        // Epic Saga (with hover explanations)
+        document.getElementById('epicSaga').innerHTML = `
+        In a world carved by courage and determination, players have mined
+        <span title="Blocks Mined">${data.totalStats.blocksMined}</span> blocks,
+        looted <span title="Chests Looted">${data.totalStats.chestsLooted}</span> chests,
+        inserted <span title="Items Inserted (ME Network)">${data.totalStats.itemsInserted_ME}</span> items,
+        and slain <span title="Mob Kills">${data.totalStats.mobKills}</span> foes.
+        They've jumped <span title="Times Jumped">${data.totalStats.timesJumped}</span> times,
+        faced doom <span title="Deaths">${data.totalStats.deaths}</span> times,
+        and spent <span title="Time Played (Minutes)">${data.totalStats.timePlayedMinutes}</span> minutes shaping this blocky world!
+        Their journey is far from over... 🚀`;
 
-                document.getElementById('onlinePlayers').innerHTML = onlinePlayers.map(p => `<li class="online">${p}</li>`).join('');
-                document.getElementById('offlinePlayers').innerHTML = offlinePlayers.map(p => `<li class="offline">${p}</li>`).join('');
+        // Server Summary
+        document.getElementById('serverSummary').innerHTML = `
+        <tr>
+            <th>Chests Looted</th>
+            <th>Items Inserted (ME Network)</th>
+            <th>Mob Kills</th>
+            <th>Times Jumped</th>
+            <th>Deaths</th>
+            <th>Time Played (Minutes)</th>
+            <th>Blocks Mined</th>
+        </tr>
+        <tr>
+            <td>${data.totalStats.chestsLooted}</td>
+            <td>${data.totalStats.itemsInserted_ME}</td>
+            <td>${data.totalStats.mobKills}</td>
+            <td>${data.totalStats.timesJumped}</td>
+            <td>${data.totalStats.deaths}</td>
+            <td>${data.totalStats.timePlayedMinutes}</td>
+            <td>${data.totalStats.blocksMined}</td>
+        </tr>`;
 
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        }
+        // Online/Offline Players
+        const onlineList = document.getElementById('onlinePlayers');
+        const offlineList = document.getElementById('offlinePlayers');
+        const allPlayers = data.playerStats.map(player => player.playerName);
+        const offlinePlayers = allPlayers.filter(player => !data.onlinePlayers.includes(player));
 
-        fetchStats();
-        setInterval(fetchStats, 900000);
-    </script>
+        onlineList.innerHTML = data.onlinePlayers.map(p => `<li class="online">${p}</li>`).join('');
+        offlineList.innerHTML = offlinePlayers.map(p => `<li class="offline">${p}</li>`).join('');
+
+    } catch (error) {
+        console.error('Error fetching stats:', error);
+    }
+}
+
+fetchStats();
+setInterval(fetchStats, 900000);
+</script>
+
 </body>
 </html>
