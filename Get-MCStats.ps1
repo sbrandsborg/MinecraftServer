@@ -73,6 +73,7 @@ function Send-RconCommand {
         [string]$password,
         [string]$command
     )
+    $client = $null
     try {
         $client = New-Object System.Net.Sockets.TcpClient
         $client.Connect($serverHost, $serverPort)
@@ -148,12 +149,14 @@ function Send-RconCommand {
                 $commandResponse += "`n" + $packet.Payload
             }
         }
-        $client.Close()
         return $commandResponse
     }
     catch {
         Write-Log "Error during RCON communication: ${_}"
         throw $_
+    }
+    finally {
+        if ($client) { $client.Close() }
     }
 }
 
@@ -239,7 +242,7 @@ Get-ChildItem -Path $statsFolder -Filter *.json | Where-Object { $ignoreFiles -n
         Write-Log "Successfully read JSON file: $filePath"
     } catch {
         Write-Log "Error reading file ${filePath}: ${_}"
-        return
+        continue
     }
     
     # Resolve player name from Mojang API.
