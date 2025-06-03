@@ -112,8 +112,8 @@
           totalBlocksMined += Object.values(player.stats["minecraft:mined"] || {}).reduce((a, b) => a + b, 0);
         });
 
-        // KONVERTER MINUTTER TIL TIMER
-        const totalHoursPlayed = Math.floor(totalTimePlayed / 60);
+        // play_time is measured in ticks. Convert ticks to hours (20 ticks/sec * 60 sec/min * 60 min/hour = 72,000)
+        const totalHoursPlayed = Math.floor(totalTimePlayed / 72000);
 
         // GENERATE FUN MINECRAFT STORY
         const storyElem = document.getElementById('story');
